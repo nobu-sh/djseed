@@ -1,50 +1,47 @@
-import { IPC } from './IPC'
+import type { ProcessEventPartials, BroadcastEvalEvent, BroadcastEvalCallback, Payloads } from '../types'
 import { createRange } from '../utils/createRange'
 import type { Client } from '../client/Client'
-
-export interface UncaughtProcError {
-  name: string
-  message: string
-  stack: string
-}
-
-export interface ProcessEventPartials {
-  payload: string
-  data?: Record<string, unknown>
-  cluster?: number
-}
-
-export interface BroadcastEvalResponse {
-  id: number
-  shards: number[]
-  result: any
-  error: any
-}
-
-export interface BroadcastEvalEvent extends ProcessEventPartials {
-  data: {
-    callback: string
-  }
-}
-
-export type BroadcastEvalCallback = (client: Client) => any
-
-export interface Payloads {
-  [key: string]: (...args: any[]) => void | Promise<void>
-}
+import { ClusterEventEmitter } from './Events'
+import { IPC } from './IPC'
 
 export class ClusterPartial {
   protected started = false
   protected readonly _client: Client
 
+  /**
+   * Cluster id.
+   */
   public readonly id: number
 
+  /**
+   * Total amount of shards across all clusters.
+   */
   public readonly totalShards: number
+  /**
+   * First shard id for this cluster.
+   */
   public readonly firstShard: number
+  /**
+   * Last shard id for this cluster.
+   */
   public readonly lastShard: number
+  /**
+   * Total amount of clusters.
+   */
   public readonly totalClusters: number
 
+  /**
+   * IPC (interprocess communication).
+   * Gateway to communicating data between
+   * clusters.
+   */
   public readonly ipc: IPC
+  /**
+   * Built in one way events from process.
+   * Also contains some methods for getting
+   * data from the primary process.
+   */
+  public readonly events = new ClusterEventEmitter()
 
   public constructor(client: Client) {
     this._client = client
@@ -331,6 +328,11 @@ export class ClusterPartial {
     },
   }
 
+  /**
+   * You dont need to call this.
+   *
+   * I mean you can if you want, but it does nothing.
+   */
   public start(): void {
     if (!this.started) {
       this._handleErrors()

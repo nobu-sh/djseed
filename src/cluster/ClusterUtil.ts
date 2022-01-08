@@ -1,4 +1,15 @@
-import type { ProcessEventPartials, Payloads, BroadcastEvalCallback, BroadcastEvalResponse } from './ClusterPartial'
+import type {
+  IPCEvent,
+  ClusterUtilOptions,
+  Cluster,
+  ProcessEventPartials,
+  Payloads,
+  BroadcastEvalCallback,
+  BroadcastEvalResponse,
+  Awaitable,
+  ClusterUtilEvents,
+  CommonError,
+} from '../types'
 import { createRange } from '../utils/createRange'
 import { getGateway } from '../utils/getGateway'
 import { chunk } from '../utils/chunk'
@@ -6,35 +17,38 @@ import { EventEmitter } from 'events'
 import nodeCluster, { Worker } from 'cluster'
 import path from 'path'
 import os from 'os'
-import type { IPCEvent } from './IPC'
 
 const coreCount = os.cpus().length
 
-export interface ClusterUtilOptions {
-  /**
-   * Total Amount Of Cluster to Open.
-   */
-  clusters?: number
-  /**
-   * Total Amount of Shards to Request.
-   */
-  shards?: number
-  /**
-   * What Shard To Start On. (Useful for horizontal scaling)
-   */
-  firstShard?: number
-  /**
-   * What Shard To End On. (Useful for horizontal scaling)
-   */
-  lastShard?: number
+export interface ClusterUtil {
+  on<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
+  on<S extends string | symbol>(
+    event: Exclude<S, keyof ClusterUtilEvents>,
+    listener: (...args: any[]) => Awaitable<void>,
+  ): this
+
+  once<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
+  once<S extends string | symbol>(
+    event: Exclude<S, keyof ClusterUtilEvents>,
+    listener: (...args: any[]) => Awaitable<void>,
+  ): this
+
+  emit<K extends keyof ClusterUtilEvents>(event: K, ...args: ClusterUtilEvents[K]): boolean
+  emit<S extends string | symbol>(event: Exclude<S, keyof ClusterUtilEvents>, ...args: unknown[]): boolean
+
+  off<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
+  off<S extends string | symbol>(
+    event: Exclude<S, keyof ClusterUtilEvents>,
+    listener: (...args: any[]) => Awaitable<void>,
+  ): this
+
+  removeAllListeners<K extends keyof ClusterUtilEvents>(event?: K): this
+  removeAllListeners<S extends string | symbol>(event?: Exclude<S, keyof ClusterUtilEvents>): this
 }
 
-interface Cluster {
-  workerId: number
-  firstShard: number
-  lastShard: number
-}
-
+// We need to override ClusterUtil to add
+// typings to all the events.
+// eslint-disable-next-line no-redeclare
 export class ClusterUtil extends EventEmitter {
   protected _token: string
   protected _file: string
@@ -60,6 +74,10 @@ export class ClusterUtil extends EventEmitter {
     nodeCluster.setMaxListeners(Infinity)
   }
 
+  /**
+   * Checks whether the current process
+   * is the primary process or a child process.
+   */
   public isPrimary(): boolean {
     return nodeCluster.isPrimary
   }
@@ -176,7 +194,7 @@ export class ClusterUtil extends EventEmitter {
 
       this.emit('DJSeed::Error', {
         type: 'Unhandled Rejection',
-        error: data,
+        error: data as unknown as CommonError,
       })
     })
   }
@@ -249,7 +267,7 @@ export class ClusterUtil extends EventEmitter {
 
         this.emit('DJSeed::Error', {
           type: 'Payload Execution Failed.',
-          error: data,
+          error: data as unknown as CommonError,
         })
       })
     })
@@ -258,38 +276,99 @@ export class ClusterUtil extends EventEmitter {
   protected payloads: Payloads = {
     'DJSeed::Cluster_Error': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Cluster_Warn': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Shard_Ready': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Shard_Resume': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Shard_Reconnecting': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Shard_Disconnect': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Shard_Error': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::Cluster_Ready': (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
+      this.sendEvent(msg)
     },
     'DJSeed::IPC_Broadcast_Event': (msg: ProcessEventPartials) => {
+      if (!('event' in (msg.data ?? {}))) return
       this.emit(msg.payload, msg.data)
       this.broadcast(msg.data as unknown as IPCEvent)
     },
     'DJSeed::IPC_Send_To_Event': (msg: ProcessEventPartials) => {
+      if (isNaN(msg.cluster ?? NaN) || !('event' in (msg.data ?? {}))) return
       this.emit(msg.payload, msg.data)
       this.sendTo(msg.cluster!, msg.data as unknown as IPCEvent)
     },
   }
 
+  /**
+   * Send a raw event to all clusters.
+   *
+   * A raw event will be sent as a payload and data
+   * it will be intercepted by the clusters `events`
+   * property. This is a one way event emmitter.
+   * @param {ProcessEventPartials} message Message to send.
+   * @param {number} i OPTIONAL. Starting point.
+   */
+  public sendEvent(message: ProcessEventPartials, i = 0): void {
+    if (isNaN(i)) i = 0
+    const cluster = this._clusters.get(i)
+    if (cluster) {
+      nodeCluster.workers![cluster.workerId]?.send(message)
+      this.sendEvent(message, ++i)
+    }
+  }
+
+  /**
+   * Send a raw event to a certain cluster.
+   *
+   * A raw event will be sent as a payload and data
+   * it will be intercepted by the clusters `events`
+   * property. This is a one way event emmitter.
+   * @param {number} clusterId Id of cluster.
+   * @param {ProcessEventPartials} message Message to send.
+   */
+  public sendEventTo(clusterId: number, message: ProcessEventPartials): void {
+    const cluster = this._clusters.get(clusterId)
+    if (cluster) {
+      const worker = nodeCluster.workers![cluster.workerId]
+      if (worker) {
+        worker.send(message)
+      }
+    }
+  }
+
+  /**
+   * Send an IPC event to all clusters.
+   *
+   * An IPC event will be sent as an event and arguments.
+   * The main difference between IPC and raw is IPC is
+   * multiple way communication. You can use it to
+   * commiunicate with clusters and clusters can use it
+   * to communicate with eachother.
+   *
+   * Also IPC events recieve the arguments differently
+   * as IPC utilizes a spread operation.
+   * @param {IPCEvent} message IPC event to send.
+   * @param {number} i OPTIONAL. Starting point.
+   */
   public broadcast(message: IPCEvent, i = 0): void {
     if (isNaN(i)) i = 0
     const cluster = this._clusters.get(i)
@@ -299,6 +378,20 @@ export class ClusterUtil extends EventEmitter {
     }
   }
 
+  /**
+   * Send an IPC event to a certain cluster.
+   *
+   * An IPC event will be sent as an event and arguments.
+   * The main difference between IPC and raw is IPC is
+   * multiple way communication. You can use it to
+   * commiunicate with clusters and clusters can use it
+   * to communicate with eachother.
+   *
+   * Also IPC events recieve the arguments differently
+   * as IPC utilizes a spread operation.
+   * @param {number} clusterId Id of cluster.
+   * @param {IPCEvent} message IPC event to send.
+   */
   public sendTo(clusterId: number, message: IPCEvent): void {
     const cluster = this._clusters.get(clusterId)
     if (cluster) {
@@ -309,6 +402,13 @@ export class ClusterUtil extends EventEmitter {
     }
   }
 
+  /**
+   * Sends callback as a string to every cluster then uses `eval`
+   * to evaulate your code on that cluster. It will return an
+   * array of objects which will contain cluster info and the
+   * result/error that occured.
+   * @param {BroadcastEvalCallback} callback Callback function.
+   */
   public async broadcastEval(callback: BroadcastEvalCallback): Promise<BroadcastEvalResponse[]> {
     const responses: BroadcastEvalResponse[] = []
     for (const cluster of this._clusters.values()) {
@@ -334,6 +434,9 @@ export class ClusterUtil extends EventEmitter {
     return Promise.all(responses)
   }
 
+  /**
+   * Start the util.
+   */
   public launch(): void {
     this._registerWorkerHandlers()
     this._registerPayloads()
@@ -343,7 +446,7 @@ export class ClusterUtil extends EventEmitter {
       this._preStart()
     } else if (nodeCluster.isWorker) {
       try {
-        // Aware this is inproper but esm is being screwy
+        // Aware this is improper but esm is being screwy
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         require(path.resolve(this._file))
       } catch (err) {
