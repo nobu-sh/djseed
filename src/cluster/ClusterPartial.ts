@@ -3,6 +3,7 @@ import { createRange } from '../utils/createRange'
 import type { Client } from '../client/Client'
 import { ClusterEventEmitter } from './Events'
 import { IPC } from './IPC'
+import { Util } from './Util'
 
 export class ClusterPartial {
   protected started = false
@@ -38,10 +39,13 @@ export class ClusterPartial {
   public readonly ipc: IPC
   /**
    * Built in one way events from process.
-   * Also contains some methods for getting
-   * data from the primary process.
    */
   public readonly events = new ClusterEventEmitter()
+
+  /**
+   * Built in utilities for doing useful stuff.
+   */
+  public readonly util: Util
 
   public constructor(client: Client) {
     this._client = client
@@ -59,6 +63,9 @@ export class ClusterPartial {
 
     // Create new IPC for cluster.
     this.ipc = new IPC(this.id)
+
+    // Create new Util for cluster
+    this.util = new Util(this.id)
 
     // Ignore process listener amount
     process.setMaxListeners(Infinity)
@@ -262,7 +269,7 @@ export class ClusterPartial {
   }
 
   protected payloads: Payloads = {
-    'DJSeed::Stats_Request': (): void => {
+    'DJSeed::Cluster_Stats_Request': (): void => {
       const shards = []
       for (const shard of this._client.ws.shards.values()) {
         shards.push({
@@ -272,7 +279,7 @@ export class ClusterPartial {
         })
       }
       process.send!({
-        payload: 'DJSeed::Stats_Return',
+        payload: 'DJSeed::Cluster_Stats_Response',
         data: {
           id: this.id,
           guilds: this._client.guilds.cache.size,

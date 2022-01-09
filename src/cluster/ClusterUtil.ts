@@ -9,6 +9,7 @@ import type {
   Awaitable,
   ClusterUtilEvents,
   CommonError,
+  ClusterStats,
 } from '../types'
 import { createRange } from '../utils/createRange'
 import { getGateway } from '../utils/getGateway'
@@ -156,8 +157,8 @@ export class ClusterUtil extends EventEmitter {
     return new Promise((res) => {
       const cb = (_: Worker, msg: ProcessEventPartials) => {
         if (msg.payload && msg.payload === 'DJSeed::Cluster_Shards_Prepared') {
-          res(true)
           nodeCluster.removeListener('message', cb)
+          res(true)
         }
       }
       nodeCluster.on('message', cb)
@@ -309,13 +310,52 @@ export class ClusterUtil extends EventEmitter {
     'DJSeed::IPC_Broadcast_Event': (msg: ProcessEventPartials) => {
       if (!('event' in (msg.data ?? {}))) return
       this.emit(msg.payload, msg.data)
-      this.broadcast(msg.data as unknown as IPCEvent)
+      this.broadcast(msg.data as IPCEvent)
     },
     'DJSeed::IPC_Send_To_Event': (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN) || !('event' in (msg.data ?? {}))) return
       this.emit(msg.payload, msg.data)
-      this.sendTo(msg.cluster!, msg.data as unknown as IPCEvent)
+      this.sendTo(msg.cluster!, msg.data as IPCEvent)
     },
+    'DJSeed::Util_All_Stats_Request': async (msg: ProcessEventPartials) => {
+      if (isNaN(msg.cluster ?? NaN)) return
+      this.sendEventTo(msg.cluster!, {
+        payload: 'DJSeed::Util_All_Stats_Response',
+        data: await this.getStats(),
+      })
+    },
+    'DJSeed::Util_Broadcast_Eval_Request': async (msg: ProcessEventPartials) => {
+      if (isNaN(msg.cluster ?? NaN) || !('callback' in (msg.data ?? {}))) return
+      this.sendEventTo(msg.cluster!, {
+        payload: 'DJSeed::Util_Broadcast_Eval_Response',
+        data: await this.broadcastEval((msg.data! as Record<string, BroadcastEvalCallback>).callback),
+      })
+    },
+  }
+
+  /**
+   * Requests stats from all clusters and return array.
+   */
+  public async getStats(): Promise<ClusterStats[]> {
+    const responses = []
+    for (const cluster of this._clusters.keys()) {
+      const response = async (): Promise<ClusterStats> => {
+        return new Promise((r) => {
+          const callback = (_: Worker, m: ProcessEventPartials) => {
+            if (m.payload === 'DJSeed::Cluster_Stats_Response') {
+              nodeCluster.removeListener('message', callback)
+              r(m.data as ClusterStats)
+            }
+          }
+          nodeCluster.on('message', callback)
+          this.sendEventTo(cluster, { payload: 'DJSeed::Cluster_Stats_Request' })
+        })
+      }
+
+      responses.push(await response())
+    }
+
+    return Promise.all(responses)
   }
 
   /**
@@ -416,8 +456,8 @@ export class ClusterUtil extends EventEmitter {
         return new Promise((r) => {
           const cb = (_: Worker, m: ProcessEventPartials) => {
             if (m.payload === 'DJSeed::Broadcast_Eval_Response') {
-              r(m.data as unknown as BroadcastEvalResponse)
               nodeCluster.removeListener('message', cb)
+              r(m.data as BroadcastEvalResponse)
             }
           }
           nodeCluster.on('message', cb)
