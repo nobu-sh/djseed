@@ -7,7 +7,7 @@ import { run as runClusterMockTest } from './cluster_mock'
 
 // Main
 async function init(): Promise<void> {
-  // We use Jest because I dont want to
+  // We don't use Jest because I dont want to
   // write a bunch of mock servers for DJS
   console.log('Budget Jest (Made In China).\n  Kid: Mommm I want Jest :(\n  Mom: No we have Jest at home :/\n\n')
   console.log(`Beginning Tests...\n`)
