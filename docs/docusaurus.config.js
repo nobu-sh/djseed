@@ -44,7 +44,7 @@ const config = {
         title: 'DJSeed',
         logo: {
           alt: 'DJSeed',
-          // src: 'img/logo.svg'
+          src: 'img/logo.png'
         },
         items: [
           {
@@ -54,7 +54,7 @@ const config = {
             label: 'Guide'
           },
           {
-            href: '',
+            href: 'https://github.com/nobu-sh/djseed',
             label: 'GitHub',
             position: 'right',
           }
@@ -81,11 +81,11 @@ const config = {
             items: [
               {
                 label: 'Discord',
-                href: '',
+                href: 'https://discord.gg/44VSDyugSz',
               },
               {
                 label: 'GitHub',
-                href: '',
+                href: 'https://github.com/nobu-sh/djseed',
               },
             ],
           },
@@ -94,7 +94,7 @@ const config = {
             items: [
               {
                 label: 'Repo',
-                href: '',
+                href: 'https://github.com/nobu-sh/djseed',
               },
             ],
           },

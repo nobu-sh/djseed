@@ -48,7 +48,7 @@
 
 .itemm {
   text-align: left;
-  max-width: 250px;
+  max-width: 240px;
   display: flex;
   flex-direction: column;
   /* max-height: 10rem; */

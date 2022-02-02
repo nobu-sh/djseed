@@ -9,9 +9,9 @@ function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <div className={clsx('header', styles.header)}>
-      <img src="img/logo.png" alt="BeAPI" />
-      <h1>BeAPI</h1>
-      <h2>Gametests could never be easier</h2>
+      <img src="img/logo.png" alt="DJSeed" />
+      <h1>DJSeed</h1>
+      <h2>Complicated concepts but like easier?</h2>
       <div className={clsx('buttons', styles.buttons)}>
         <Link
             className="button button--primary button--lg"
@@ -27,27 +27,23 @@ function HomepageHeader() {
       <div className={clsx('content', styles.content)}>
         <div className={clsx('itemm', styles.itemm)}>
           <h3>😀 Simple Setup</h3>
-          <p>Simple minimilistic setup utiizing NPM with next to no hastle!</p>
+          <p>Next to no boilerplate or project scaffolding needed!</p>
         </div>
         <div className={clsx('itemm', styles.itemm)}>
           <h3>🛠️ Rich Features</h3>
-          <p>adds polyfill for more helpful events and methods.</p>
+          <p>Yeahhhh... this ones definitely a work in progress :)</p>
         </div>
         <div className={clsx('itemm', styles.itemm)}>
-          <h3>📦 Optimized Build</h3>
-          <p>Precompiled BeAPI core modules leave a small footprint.</p>
+          <h3>📦 Lightweight</h3>
+          <p>Compiled and pre-bundled ready for production!</p>
         </div>
         <div className={clsx('itemm', styles.itemm)}>
-          <h3>🔩 Share Your Creations</h3>
-          <p>New module concepts, sharing your creations easier than ever.</p>
+          <h3>🔑 Strictly Typed API</h3>
+          <p>Complete statically typed APIs with Typescript.</p>
         </div>
         <div className={clsx('itemm', styles.itemm)}>
-          <h3>🔑 Fully Typed APIs</h3>
-          <p>Completely typed programmatic APIs with Typescript.</p>
-        </div>
-        <div className={clsx('itemm', styles.itemm)}>
-          <h3>😎 Made By Cool People</h3>
-          <p>Big thanks to <a href="https://github.com/NobUwU">NobUwU</a> and <a href="https://github.com/PMK744">PMK744</a>!</p>
+          <h3>🔓 Open Source</h3>
+          <p>Entirely open source project, licensed under <a href="https://opensource.org/licenses/MIT">MIT</a></p>
         </div>
       </div>
     </div>

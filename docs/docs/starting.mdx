@@ -2,98 +2,66 @@
 sidebar_position: 1
 title: Getting Started
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
-## Overview
+## About
+DJSeed *(Dee-Jey-Es, See-Duh)* aims to be a quality of life addon for the popular
+[Discord](https://discord.com/) interaction library [Discord.js](https://discord.js.org/#/).
+It *will eventually* offer a bunch of tools which can be found on the [Roadmap](/docs/starting) *once its made*.
+Currently DJSeed offers sharding and multithreading (clusters) which is quite frankly the most asked for thing.
+So win, win... *right?*
 
-BeAPI (an abbreviation for "Bedrock edition API") is a tool that aims for a faster and more reliable development expierence when working with Minecraft Bedrock edition gametests. It currently consists of two major parts:
+## Installation
 
-- `beapi-core`: is our core module that provides a handlful of features gametest does not offer at this time. It is also bundled with some cli commands to make development easier.
+:::info
 
-- `create-beapi`: is our module create app module which enabled clients to easily scaffold their first BeAPI project.
-
-
-## Language Support
-
-With gametest support being [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) supported only we are only really left with two primary options when it comes to language support.
-
-The supported template presets are:
-
-| Javascript | Typescript |
-| :--------: | :--------: |
-| vanilla    | vanilla    |
-
-## Scaffolding Your First Project
-
-:::caution Version Warning
-
-BeAPI requires [Node.js](https://nodejs.org/) version >= 12.0.0.
-
-For best support it is recommended you install [Node.js LTS](https://nodejs.org/).
+DJSeed as of (1/13/2022) depends on on [Discord.js](https://discord.js.org/#/) version `>= 13.5.0`
 
 :::
 
-To scaffold your first project you will need to navigate to your Minecraft `development_behavior_packs` folder which is usually located at `C:\Users\{USER}\AppData\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\games\com.mojang\development_behavior_packs`
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    <CodeBlock className="language-bash">
+      npm i discord.js djseed
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+    <CodeBlock className="language-bash">
+      yarn add discord.js djseed
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+    <CodeBlock className="language-bash">
+      pnpm add discord.js djseed
+    </CodeBlock>
+  </TabItem>
+</Tabs>
 
-### Installing
+## Basic Usage
+This is the absolute basic way to use DJSeed, currently the only thing
+we offer is multithreading so doing this will do absolutely nothing other
+than prepare you for multithreading.
 
-When creating BeAPI our main concern was simplicity for our end users when attempting to use our package. After some scheming we ultimetly decided NPM modules would be the best route.
+### Client
+```js
+const { Client, Intents } = require('djseed')
 
-Depending on your package manager, you will need to run one of the following commands.
+const bot = new Client('MY_COOL_TOKEN', {
+  intents: [Intents.FLAGS.GUILDS],
+})
 
-NPM:
-```bash
-npm init beapi@latest
-```
-Yarn:
-```bash
-yarn create beapi@latest
-```
+bot.on('ready', () => {
+  console.info(`Logged in as ${bot.user.username}#${bot.user.discriminator}!`)
+  console.info(`Multithreading is ${bot.cluster ? 'enabled' : 'disabled'}!`)
+})
 
-![createProject](./public/createProject.gif)
-
-### Building
-Minecrafts gametest module linker is not the best thing known to man kind. To make everything function correctly you'll need to build the project every time you make a change so BeAPI can transpile its core module into your code.
-
-NPM:
-```bash
-$ npm run build
-```
-Yarn:
-```bash
-$ yarn build
-```
-
-![buildProject](./public/buildProject.gif)
-
-### Bundling
-Once you feel you've finished your package and you're ready to prepare it for production and distribution you may want to bundle it into a `.mcpack` first.
-
-NPM:
-```bash
-$ npm run bundle
-```
-Yarn:
-```bash
-$ yarn bundle
+bot.login()
 ```
 
-![bundleProject](./public/bundleProject.gif)
+### Extra Notes
 
-#### How Do I Tell The Bundler To Include More Files?
-We realized when making Minecraft packs users may want to add more files to the final pack.
-So we made the bundler parse a property in your package called `include`.
-The bundler will recognize and recursively add any files or folders to the final bundled package.
-
-This field should look like so:
-
-```json
-{
-  "include": [
-    "scripts",
-    "manifest.json",
-    "animation_controllers",
-    "entities",
-    "pack_icon.png"
-  ]
-}
-```
+DJSeed only exports `Intents` from [Discord.js](https://discord.js.org/#/)!
+If you wish to use other provided classes/methods/typedefs from [Discord.js](https://discord.js.org/#/)
+you must import them from it directly!
