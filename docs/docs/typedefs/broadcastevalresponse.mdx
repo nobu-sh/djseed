@@ -1,0 +1,17 @@
+---
+title: BroadcastEvalResponse
+---
+
+Response object from broadcast evaluation.
+
+## Type
+- [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+## Properties
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| id | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Id of cluster. |
+| shards | [number[]](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Array of shard ids. |
+| result | any |  ❌   | `null`  | Returned data from broadcast eval callback. |
+| error | any |  ❌   | `null`  | Error data if eval contained errors. |

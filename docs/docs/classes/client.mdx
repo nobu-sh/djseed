@@ -1,0 +1,57 @@
+---
+title: Client
+---
+
+#### Extends [DJSClient](https://discord.js.org/#/docs/discord.js/stable/class/Client)
+
+The main hub for interacting with the DJSeed.
+
+## Constructor
+
+```js
+new Client(token, options);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| token | [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) |  ❌   | `undefined`  | Discord API Token. |
+| options | [ClientOptions](/docs/typedefs/clientoptions) |  ❌   | `undefined`  | Client Options. Current No Different From [DJSClientOptions](https://discord.js.org/#/docs/discord.js/stable/typedef/ClientOptions). |
+
+## Properties
+
+### _token `READONLY`
+Client Discord API token.
+
+**Type:** [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+___
+
+### _options `READONLY`
+Client options object.
+
+**Type:** [ClientOptions](/docs/typedefs/clientoptions)
+___
+
+### cluster `READONLY`
+Client cluster partial.
+
+:::warning
+Will only be defined if using [ClusterUtil](/docs/classes/clusterutil)!
+:::
+
+**Type:** [ClusterPartial](/docs/classes/clusterpartial) | undefined
+___
+
+
+## Methods
+
+### login `OVERRIDE`
+Method that overrides [DJSClient#login](https://discord.js.org/#/docs/discord.js/stable/class/Client?scrollTo=login).
+A token does __NOT__ need to be passed as a parameter, as it is passed in [Client#contructor](/docs/Classes/client#constructor).
+
+```js
+login();
+```
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) >
+___

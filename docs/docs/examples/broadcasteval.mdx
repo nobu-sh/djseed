@@ -1,0 +1,121 @@
+---
+title: Broadcast Eval
+---
+
+In this example we will review broadcast evaluation with and without references. This will be based off of what was done in the [Sharding Example](/docs/examples/sharding).
+
+## No References
+Sometimes on a specfic cluster you will need data from the client on all other clusters.
+Rather than approaching this with [IPC](/docs/classes/ipc) and having to write more code.
+You can simply approach it with a broadcastEval to get needed data.
+
+To display this we will be registering a command which returns
+the total amount of guilds the bot is in.
+
+```js title="src/cluster.js"
+// Import Client And Intents.
+const { Client, Intents } = require('djseed');
+
+// Construct New Bot.
+const bot = new Client('replace-with-bot-token', { intents: [Intents.FLAGS.GUILDS] });
+
+...
+
+// Add Listener For Message Create
+bot.on('messageCreate', async (msg) => {
+  // If Message Is !guilds.
+  if (msg.content.toLowerCase() === '!guilds') {
+    // Send Broadcast Eval Request To Get Cache Size On All Clusters.
+    const guilds = await bot.cluster.util.broadcastEval((client) => {
+      return client.guilds.cache.size
+    });
+    
+    // Calculate Total
+    const total = guilds.map((cluster) => cluster.result).reduce((a, b) => a + b);
+    
+    // Reply To Message.
+    msg.reply(`${total}`);
+  }
+});
+
+// Log Bot Into Gateway.
+bot.login();
+```
+### Wrapping Up
+Running `!guilds` in the code example above will reply with the total number of guilds
+across all clusters.
+
+## No References
+The above code is all fine and dandy until you need a reference from outside the callback.
+By default references are not linked to your callback resulting in an error when trying 
+to use a variable outside the callback.
+
+So reusing the code example above lets say we want to add 10 guilds to each clusters guild
+count.
+
+```js title="❌ src/cluster.js"
+// THROWS ERROR: "guildsToAdd" is not defined.
+...
+
+// Add Listener For Message Create
+bot.on('messageCreate', async (msg) => {
+  // If Message Is !guilds.
+  if (msg.content.toLowerCase() === '!guilds') {
+    // Guilds To Add To Each Cluster
+    const guildsToAdd = 10;
+
+    // Send Broadcast Eval Request To Get Cache Size On All Clusters.
+    const guilds = await bot.cluster.util.broadcastEval((client) => {
+      return client.guilds.cache.size + guildsToAdd
+    });
+
+    // Calculate Total
+    const total = guilds.map((cluster) => cluster.result).reduce((a, b) => a + b);
+    
+    // Reply To Message.
+    msg.reply(`${total}`);
+  }
+});
+
+...
+```
+THIS WILL NOT WORK! This is the callback is converted to a string when being
+sent off to be evaulated. Meaning it loses all outside references.
+
+The way around this if to pass `guildsToAdd` as a primitave reference.
+We can do this like so:
+
+```js title="✔️ src/cluster.js"
+// Works
+...
+
+// Add Listener For Message Create
+bot.on('messageCreate', async (msg) => {
+  // If Message Is !guilds.
+  if (msg.content.toLowerCase() === '!guilds') {
+    // Guilds To Add To Each Cluster
+    const guildsToAdd = 10;
+
+    // Send Broadcast Eval Request To Get Cache Size On All Clusters.
+    const guilds = await bot.cluster.util.broadcastEval((client) => {
+      return client.guilds.cache.size + guildsToAdd
+    }, {
+      // Add `guildsToAdd` as a reference
+      guildsToAdd,
+    });
+
+    // Calculate Total
+    const total = guilds.map((cluster) => cluster.result).reduce((a, b) => a + b);
+    
+    // Reply To Message.
+    msg.reply(`${total}`);
+  }
+});
+
+...
+```
+
+### Wrapping Up
+When needing to use variables outside of the callback scope you will need
+to pass a second parameter to `broadcastEval` of type object which contains
+all outside references used inside the callback.

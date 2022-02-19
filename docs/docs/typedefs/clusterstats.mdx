@@ -1,0 +1,21 @@
+---
+title: ClusterStats
+---
+
+Cluster stats.
+
+## Type
+- [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+## Properties
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| id | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Cluster id. |
+| guilds | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Total number of guilds in this cluster. |
+| largeGuilds | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Total number of guilds (considered large by discord) in this cluster. |
+| exclusiveGuilds | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Total number of guilds (that only have this bot) in this cluster. |
+| users | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Total number of users in this cluster. |
+| uptime | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) \| null |  ❌   | `null`  | How long since the client has entered `READY` state in milliseconds. |
+| mem | [ClusterMem](/docs/typedefs/clustermem) |  ❌   | `null`  | Memory usage info in bytes. |
+| shards | [ShardStats[]](/docs/typedefs/shardstats) |  ❌   | `null`  | Shard stats. |

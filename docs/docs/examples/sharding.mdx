@@ -1,0 +1,98 @@
+---
+title: Sharding
+sidebar_position: 1
+---
+
+In this example we will go over how to prepare you bot for sharding.
+
+These examples will be shown in JavaScript, however, the TypeScript
+syntax will be essentially the same.
+
+## Project Directory
+First lets review how our project directory should look.
+Due to how DJSeed works, [ClusterUtil](/docs/classes/clusterutil)
+will need to be in its own file.
+
+```
+├── node_modules
+├── src
+│   ├── index.js
+│   └── cluster.js
+├── package-lock.json
+└── package.json
+```
+
+## Package.json
+Your package should look something like below.
+
+```json title="package.json"
+{
+  "name": "my-bot",
+  "version": "1.0.0",
+  "main": "src/index.js",
+
+  "dependencies": {
+    "discord.js": "^13.5.1",
+    "djseed": "^1.0.0"
+  }
+}
+```
+
+## ClusterUtil
+First we will need to create our [ClusterUtil](/docs/classes/clusterutil).
+ClusterUtil will act as our parent process managing all our bot clusters
+and ensuring they are all working as intended.
+
+```js title="src/index.js"
+// Import ClusterUtil.
+const { ClusterUtil } = require('djseed');
+
+// Make New ClusterUtil Instance.
+const util = new ClusterUtil('replace-with-bot-token', './cluster.js');
+
+// Register Events.
+// NOTE: We are registering a listener to every event here.
+// You are not required to do this. We utilize events instead of 
+// Logging so you can handle telemetry however you like!
+util.on('DJSeed::Cluster_Util_Info', (i) => console.log('[DJSeed::Cluster_Util_Info]:', i));
+util.on('DJSeed::Cluster_Util_Error', (i) => console.log('[DJSeed::Cluster_Util_Error]:', i));
+util.on('DJSeed::Cluster_Ready', (i) => console.log('[DJSeed::Cluster_Ready]:', i));
+util.on('DJSeed::Cluster_Death', (i) => console.log('[DJSeed::Cluster_Death]:', i));
+util.on('DJSeed::Cluster_Error', (i) => console.log('[DJSeed::Cluster_Error]:', i));
+util.on('DJSeed::Cluster_Warn', (i) => console.log('[DJSeed::Cluster_Warn]:', i));
+util.on('DJSeed::Shard_Ready', (i) => console.log('[DJSeed::Shard_Ready]:', i));
+util.on('DJSeed::Shard_Resume', (i) => console.log('[DJSeed::Shard_Resume]:', i));
+util.on('DJSeed::Shard_Reconnecting', (i) => console.log('[DJSeed::Shard_Reconnecting]:', i));
+util.on('DJSeed::Shard_Disconnect', (i) => console.log('[DJSeed::Shard_Disconnect]:', i));
+util.on('DJSeed::Shard_Error', (i) => console.log('[DJSeed::Shard_Error]:', i));
+
+
+// Start Util.
+util.launch();
+
+```
+
+## Client
+Next we will need to construct our cluster compatible client.
+This part is very similar to making a client in Discord.JS.
+
+```js title="src/cluster.js"
+// Import Client And Intents.
+const { Client, Intents } = require('djseed');
+
+// Construct New Bot.
+const bot = new Client('replace-with-bot-token', { intents: [Intents.FLAGS.GUILDS] });
+
+// Create Ready Listener.
+bot.once('ready', () => {
+  console.log(`Logged in as ${bot.user.username}#${bot.user.discriminator}!`);
+  console.log(bot.cluster ? 'Clustered' : 'Not Clustered');
+});
+
+// Log Bot Into Gateway.
+bot.login();
+```
+
+## Wrapping Up
+Thats quite simply it. The code example will request information from your bots gateway
+and open the needed amount of clusters/shards accordingly.

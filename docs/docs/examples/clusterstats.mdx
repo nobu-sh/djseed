@@ -1,0 +1,59 @@
+---
+title: Cluster Stats
+---
+
+In this example, we will be building off of what was done in the [Sharding Example](/docs/examples/sharding).
+
+## Stats Command
+To keep it simple we are going to make a *chat* command that responds with the bots stats.
+
+```js title="src/cluster.js"
+// Import Client And Intents.
+const { Client, Intents } = require('djseed');
+
+// Construct New Bot.
+const bot = new Client('replace-with-bot-token', {
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES
+  ]
+});
+
+...
+
+// Add Listener For Message Create
+bot.on('messageCreate', async (msg) => {
+  // If Message Is !stats.
+  if (msg.content.toLowerCase() === '!stats') {
+    // Fetch Fresh Stats.
+    const stats = await bot.cluster.util.getStats();
+
+    // Map Clusters Into Embed Fields.
+    const mappedStats = stats.map((cluster) => {
+      let value = `\`\`\``;
+      value += `Shards: ${cluster.shards.length}\n`;
+      value += `Guilds: ${cluster.guilds}\n`;
+      value += `Users: ${cluster.users}`;
+      value += `\`\`\``;
+
+      return {
+        inline: true,
+        name: `Cluster ${cluster.id}`,
+        value: value
+      }
+    });
+
+    // Send Message.
+    msg.reply({ embeds: [{
+      title: "Stats",
+      fields: mappedStats
+    }] });
+  }
+});
+
+// Log Bot Into Gateway.
+bot.login();
+```
+## Wrapping Up
+If you send `!stats` in a channel the bot is in, it should respond
+with a dynamic embed with imformation on your cluster(s).

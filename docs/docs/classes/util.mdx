@@ -1,0 +1,45 @@
+---
+title: Util
+---
+
+Hub containing some useful utils for other clusters.
+
+## Constructor
+
+```js
+new Util(cid);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| cid | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `undefined`  | Cluster ID. |
+
+## Methods
+
+### getStats
+Requests stats from all clusters and returns an array.
+```js
+getStats();
+```
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [ClusterStats](/docs/typedefs/clusterstats)[] >
+___
+
+### broadcastEval
+Sends callback as a string to every cluster then uses `eval`
+to evaulate your code on that cluster. It will return an
+array of objects which will contain cluster info and the
+result/error that occured.
+```js
+broadcastEval(callback, references);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| callback | [BroadcastEvalCallback](/docs/typedefs/broadcastevalcallback) |  ❌   | `undefined`  | Callback function to be evaulated. |
+| references | [object?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) | ✔️ | `undefined`  | Callback function to be evaulated. |
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [BroadcastEvalResponse](/docs/typedefs/broadcastevalresponse)[] >
+___
