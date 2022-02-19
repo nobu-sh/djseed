@@ -1,7 +1,7 @@
 import type { ClusterEvents, Awaitable, ProcessEventPartials } from '../types'
 import { EventEmitter } from 'events'
 
-export interface ClusterEventeMitter {
+export interface ClusterEventEmitter {
   on<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>): this
   on<S extends string | symbol>(
     event: Exclude<S, keyof ClusterEvents>,

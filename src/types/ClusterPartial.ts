@@ -12,16 +12,17 @@ export interface ProcessEventPartials {
   cluster?: number
 }
 
-export interface BroadcastEvalResponse {
+export interface BroadcastEvalResponse<T> {
   id: number
   shards: number[]
-  result: any
+  result: T
   error: any
 }
 
 export interface BroadcastEvalEvent extends ProcessEventPartials {
   data: {
     callback: string
+    references?: Record<string, unknown>
   }
 }
 
@@ -37,12 +38,20 @@ export interface ShardStats {
   latency: number
 }
 
+export interface ClusterMem {
+  rss: number
+  heapTotal: number
+  heapUsed: number
+  external: number
+  arrayBuffers: number
+}
+
 export interface ClusterStats {
   id: number
   guilds: number
   users: number
   uptime: number | null
-  ram: number
+  mem: ClusterMem
   shards: ShardStats[]
   largeGuilds: number
   exclusiveGuilds: number

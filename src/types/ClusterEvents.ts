@@ -34,6 +34,10 @@ export interface ClusterEvents {
    * Sent when a cluster has become ready.
    */
   'DJSeed::Cluster_Ready': [Cluster_Ready]
+  /**
+   * Sent when a cluster dies.
+   */
+  'DJSeed::Cluster_Death': [Cluster_Death]
 }
 
 export interface Cluster_Error {
@@ -93,4 +97,13 @@ export interface Cluster_Ready {
   id: number
   shards: number[]
   type: string
+}
+
+export interface Cluster_Death {
+  id: number
+  shards: number[]
+  type: string
+  message: string
+  code: number
+  signal: string
 }

@@ -10,6 +10,7 @@ import type {
   ClusterUtilEvents,
   CommonError,
   ClusterStats,
+  BroadcastEvalEvent,
 } from '../types'
 import { createRange } from '../utils/createRange'
 import { getGateway } from '../utils/getGateway'
@@ -73,6 +74,8 @@ export class ClusterUtil extends EventEmitter {
     // Ignore process listener amount
     process.setMaxListeners(Infinity)
     nodeCluster.setMaxListeners(Infinity)
+
+    this.on('DJSeed::Cluster_Death', (data) => this.sendEvent({ payload: 'DJSeed::Cluster_Death', data }))
   }
 
   /**
@@ -92,7 +95,7 @@ export class ClusterUtil extends EventEmitter {
           this._totalShards = gateway.shards
         } catch (error) {
           console.error(error)
-          throw new Error('Failed to fetch bot gateway :/')
+          throw new Error('Failed to fetch bot gateway :/ Try again?? This is most likely a discord problem.')
         }
       }
       if (!this._totalClusters) {
@@ -171,7 +174,7 @@ export class ClusterUtil extends EventEmitter {
       const message = String(err.message)
       const stack = String(err.stack)
 
-      this.emit('DJSeed::Error', {
+      this.emit('DJSeed::Cluster_Util_Error', {
         type: 'Uncaught Exception',
         error: {
           name,
@@ -193,7 +196,7 @@ export class ClusterUtil extends EventEmitter {
         data.stack = String(error.stack)
       }
 
-      this.emit('DJSeed::Error', {
+      this.emit('DJSeed::Cluster_Util_Error', {
         type: 'Unhandled Rejection',
         error: data as unknown as CommonError,
       })
@@ -266,7 +269,7 @@ export class ClusterUtil extends EventEmitter {
 
         data.message += String("\nThis has to do with your code, NOT DJSeed's!")
 
-        this.emit('DJSeed::Error', {
+        this.emit('DJSeed::Cluster_Util_Error', {
           type: 'Payload Execution Failed.',
           error: data as unknown as CommonError,
         })
@@ -324,11 +327,11 @@ export class ClusterUtil extends EventEmitter {
         data: await this.getStats(),
       })
     },
-    'DJSeed::Util_Broadcast_Eval_Request': async (msg: ProcessEventPartials) => {
-      if (isNaN(msg.cluster ?? NaN) || !('callback' in (msg.data ?? {}))) return
+    'DJSeed::Util_Broadcast_Eval_Request': async (msg: BroadcastEvalEvent) => {
+      if (isNaN(msg.cluster ?? NaN) || !('callback' in msg.data)) return
       this.sendEventTo(msg.cluster!, {
         payload: 'DJSeed::Util_Broadcast_Eval_Response',
-        data: await this.broadcastEval((msg.data! as Record<string, BroadcastEvalCallback>).callback),
+        data: await this.broadcastEval(msg.data.callback as unknown as BroadcastEvalCallback, msg.data.references),
       })
     },
   }
@@ -448,22 +451,26 @@ export class ClusterUtil extends EventEmitter {
    * array of objects which will contain cluster info and the
    * result/error that occured.
    * @param {BroadcastEvalCallback} callback Callback function.
+   * @param {Record<string, unknown>} references References needed in callback.
    */
-  public async broadcastEval(callback: BroadcastEvalCallback): Promise<BroadcastEvalResponse[]> {
-    const responses: BroadcastEvalResponse[] = []
+  public async broadcastEval<T>(
+    callback: BroadcastEvalCallback,
+    references?: Record<string, unknown>,
+  ): Promise<BroadcastEvalResponse<T>[]> {
+    const responses: BroadcastEvalResponse<T>[] = []
     for (const cluster of this._clusters.values()) {
-      async function getEval(): Promise<BroadcastEvalResponse> {
+      async function getEval(): Promise<BroadcastEvalResponse<T>> {
         return new Promise((r) => {
           const cb = (_: Worker, m: ProcessEventPartials) => {
             if (m.payload === 'DJSeed::Broadcast_Eval_Response') {
               nodeCluster.removeListener('message', cb)
-              r(m.data as BroadcastEvalResponse)
+              r(m.data as BroadcastEvalResponse<T>)
             }
           }
           nodeCluster.on('message', cb)
           nodeCluster.workers![cluster.workerId]?.send({
             payload: 'DJSeed::Broadcast_Eval_Request',
-            data: { callback: callback.toString() },
+            data: { callback: callback.toString(), references },
           })
         })
       }

@@ -285,7 +285,13 @@ export class ClusterPartial {
           guilds: this._client.guilds.cache.size,
           users: this._client.users.cache.size,
           uptime: this._client.uptime,
-          ram: process.memoryUsage().rss,
+          mem: {
+            rss: process.memoryUsage().rss,
+            heapTotal: process.memoryUsage().heapTotal,
+            heapUsed: process.memoryUsage().heapUsed,
+            external: process.memoryUsage().external,
+            arrayBuffers: process.memoryUsage().arrayBuffers,
+          },
           shards,
           largeGuilds: this._client.guilds.cache.filter((g) => g.large).size,
           exclusiveGuilds: this._client.guilds.cache.filter((g) => g.members.cache.filter((m) => m.user.bot).size === 1)
@@ -295,10 +301,19 @@ export class ClusterPartial {
     },
     'DJSeed::Broadcast_Eval_Request': async (msg: BroadcastEvalEvent): Promise<void> => {
       try {
-        // This concern is voiced in documentation
-        // eslint-disable-next-line no-eval
-        const callback: BroadcastEvalCallback = (0, eval)(msg.data.callback)
-        const result = await callback(this._client)
+        const references = Object.entries(msg.data.references ?? {})
+
+        const scoped = (): Promise<any> => {
+          // This concern is voiced in documentation
+          // eslint-disable-next-line no-eval
+          const callback: BroadcastEvalCallback = (0, eval)(
+            `${references.map(([key, value]) => `const ${key} = ${value as string};`).join('')}\n${msg.data.callback}`,
+          )
+
+          return callback(this._client)
+        }
+
+        const result = await scoped()
 
         process.send!({
           payload: 'DJSeed::Broadcast_Eval_Response',
