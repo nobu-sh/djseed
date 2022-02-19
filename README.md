@@ -11,5 +11,5 @@ Currently DJSeed offers sharding and multithreading (clusters) which is quite fr
 So win, win... *right?*
 
 ## Usage
-Read the [DOCS](/)
+Read the [DOCS](https://nobu-sh.github.io/djseed/)
 
