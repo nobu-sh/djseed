@@ -59,7 +59,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`Docs`}
-      description="an advanced Minecraft Bedrock edition gametest wrapper.">
+      description="Discord.js but easier for you :)">
       <HomepageHeader />
     </Layout>
   );
