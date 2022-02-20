@@ -58,3 +58,20 @@ broadcastEval(callback, references);
 #### Returns
 [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [BroadcastEvalResponse](/docs/typedefs/broadcastevalresponse)[] >
 ___
+
+### disposeOf
+Sends a request to specified cluster to dispose itself.
+Will result in the cluster exiting with code 0 and being automatically
+restarted by `ClusterUtil`.
+
+```js
+disposeOf(clusterId);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Cluster identifier. |
+
+#### Returns
+void
+___
