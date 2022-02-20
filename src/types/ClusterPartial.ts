@@ -8,7 +8,7 @@ export interface UncaughtProcError {
 
 export interface ProcessEventPartials {
   payload: string
-  data?: object
+  data?: any
   cluster?: number
 }
 

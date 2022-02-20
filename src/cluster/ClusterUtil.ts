@@ -327,6 +327,13 @@ export class ClusterUtil extends EventEmitter {
         data: await this.getStats(),
       })
     },
+    'DJSeed::Util_Stats_Request': async (msg: ProcessEventPartials) => {
+      if (isNaN(msg.cluster ?? NaN) || !('clusterId' in (msg.data ?? {})) || isNaN(msg.data.clusterId as number)) return
+      this.sendEventTo(msg.cluster!, {
+        payload: 'DJSeed::Util_Stats_Response',
+        data: [await this.getStatsFrom(msg.data.clusterId as number)],
+      })
+    },
     'DJSeed::Util_Broadcast_Eval_Request': async (msg: BroadcastEvalEvent) => {
       if (isNaN(msg.cluster ?? NaN) || !('callback' in msg.data)) return
       this.sendEventTo(msg.cluster!, {
@@ -342,23 +349,31 @@ export class ClusterUtil extends EventEmitter {
   public async getStats(): Promise<ClusterStats[]> {
     const responses = []
     for (const cluster of this._clusters.keys()) {
-      const response = async (): Promise<ClusterStats> => {
-        return new Promise((r) => {
-          const callback = (_: Worker, m: ProcessEventPartials) => {
-            if (m.payload === 'DJSeed::Cluster_Stats_Response') {
-              nodeCluster.removeListener('message', callback)
-              r(m.data as ClusterStats)
-            }
-          }
-          nodeCluster.on('message', callback)
-          this.sendEventTo(cluster, { payload: 'DJSeed::Cluster_Stats_Request' })
-        })
-      }
-
-      responses.push(await response())
+      const stats = await this.getStatsFrom(cluster)
+      if (stats) responses.push(stats)
     }
 
     return Promise.all(responses)
+  }
+
+  /**
+   * Requests stats from a specific cluster.
+   */
+  public async getStatsFrom(clusterId: number): Promise<ClusterStats | undefined> {
+    if (!this._clusters.has(clusterId)) return undefined
+    const response = async (): Promise<ClusterStats> => {
+      return new Promise((r) => {
+        const callback = (_: Worker, m: ProcessEventPartials) => {
+          if (m.payload === 'DJSeed::Cluster_Stats_Response') {
+            nodeCluster.removeListener('message', callback)
+            r(m.data as ClusterStats)
+          }
+        }
+        nodeCluster.on('message', callback)
+        this.sendEventTo(clusterId, { payload: 'DJSeed::Cluster_Stats_Request' })
+      })
+    }
+    return response()
   }
 
   /**
