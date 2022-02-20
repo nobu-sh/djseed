@@ -5,6 +5,12 @@ export class Util {
 
   public constructor(id: number) {
     this.id = id
+    // Handle Dispose/Kill
+    process.on('message', (msg: ProcessEventPartials) => {
+      if (msg.payload === 'DJSeed::Dispose_Self') {
+        process.exit(0)
+      }
+    })
   }
 
   /**
@@ -74,6 +80,19 @@ export class Util {
         cluster: this.id,
         data: { callback: callback.toString(), references },
       })
+    })
+  }
+
+  /**
+   * Sends a request to specified cluster to dispose itself.
+   * Will result in the cluster exiting with code 0 and being automatically
+   * restarted by `ClusterUtil`.
+   * @param clusterId Id of cluster.
+   */
+  public disposeOf(clusterId: number): void {
+    process.send!({
+      payload: 'DJSeed::Dispose_Self_Request',
+      cluster: clusterId,
     })
   }
 }
