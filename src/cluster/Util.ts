@@ -27,6 +27,29 @@ export class Util {
   }
 
   /**
+   * Requests stats from a specific cluster.
+   */
+  public async getStatsFrom(clusterId: number): Promise<ClusterStats | undefined> {
+    if (isNaN(clusterId)) return undefined
+    return new Promise((r) => {
+      const callback = (msg: ProcessEventPartials) => {
+        if (msg.payload === 'DJSeed::Util_Stats_Response') {
+          process.removeListener('message', callback)
+          r((msg.data as ClusterStats[])[0] ?? undefined)
+        }
+      }
+      process.on('message', callback)
+      process.send!({
+        payload: 'DJSeed::Util_Stats_Request',
+        cluster: this.id,
+        data: {
+          clusterId,
+        },
+      })
+    })
+  }
+
+  /**
    * Sends callback as a string to every cluster then uses `eval`
    * to evaulate your code on that cluster. It will return an
    * array of objects which will contain cluster info and the

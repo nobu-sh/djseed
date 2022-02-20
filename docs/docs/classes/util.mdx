@@ -26,6 +26,21 @@ getStats();
 [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [ClusterStats](/docs/typedefs/clusterstats)[] >
 ___
 
+### getStatsFrom
+Returns stats on a specfic cluster and the shards it contains etc.
+
+```js
+getStatsFrom(clusterId);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Cluster identifier. |
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [ClusterStats](/docs/typedefs/clusterstats) | undefined >
+___
+
 ### broadcastEval
 Sends callback as a string to every cluster then uses `eval`
 to evaulate your code on that cluster. It will return an
