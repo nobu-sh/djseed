@@ -310,14 +310,19 @@ export class ClusterUtil extends EventEmitter {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
+    'DJSeed::Dispose_Self_Request': (msg: ProcessEventPartials) => {
+      if (isNaN(msg.cluster ?? NaN)) return
+      // this.emit(msg.payload, msg.data)
+      this.sendEventTo(msg.cluster!, { payload: 'DJSeed::Dispose_Self' })
+    },
     'DJSeed::IPC_Broadcast_Event': (msg: ProcessEventPartials) => {
       if (!('event' in (msg.data ?? {}))) return
-      this.emit(msg.payload, msg.data)
+      // this.emit(msg.payload, msg.data)
       this.broadcast(msg.data as IPCEvent)
     },
     'DJSeed::IPC_Send_To_Event': (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN) || !('event' in (msg.data ?? {}))) return
-      this.emit(msg.payload, msg.data)
+      // this.emit(msg.payload, msg.data)
       this.sendTo(msg.cluster!, msg.data as IPCEvent)
     },
     'DJSeed::Util_All_Stats_Request': async (msg: ProcessEventPartials) => {
@@ -494,6 +499,16 @@ export class ClusterUtil extends EventEmitter {
     }
 
     return Promise.all(responses)
+  }
+
+  /**
+   * Sends a request to specified cluster to dispose itself.
+   * Will result in the cluster exiting with code 0 and being automatically
+   * restarted by `ClusterUtil`.
+   * @param clusterId Id of cluster.
+   */
+  public disposeOf(clusterId: number): void {
+    this.sendEventTo(clusterId, { payload: 'DJSeed::Dispose_Self' })
   }
 
   /**
