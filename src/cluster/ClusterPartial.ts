@@ -78,7 +78,7 @@ export class ClusterPartial {
       const stack = String(err.stack)
 
       process.send!({
-        payload: 'DJSeed::Cluster_Error',
+        payload: 'Cluster_Error',
         data: {
           id: this.id,
           shards: createRange(this.firstShard, this.lastShard),
@@ -105,7 +105,7 @@ export class ClusterPartial {
       }
 
       process.send!({
-        payload: 'DJSeed::Cluster_Error',
+        payload: 'Cluster_Error',
         data: {
           id: this.id,
           shards: createRange(this.firstShard, this.lastShard),
@@ -124,7 +124,7 @@ export class ClusterPartial {
         const stack = String(err.stack)
 
         process.send!({
-          payload: 'DJSeed::Cluster_Error',
+          payload: 'Cluster_Error',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -141,7 +141,7 @@ export class ClusterPartial {
         const message = String(msg)
 
         process.send!({
-          payload: 'DJSeed::Cluster_Warn',
+          payload: 'Cluster_Warn',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -152,7 +152,7 @@ export class ClusterPartial {
       })
       .on('shardReady', (id, unavailabledGuilds) => {
         process.send!({
-          payload: 'DJSeed::Shard_Ready',
+          payload: 'Shard_Ready',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -164,7 +164,7 @@ export class ClusterPartial {
       })
       .on('shardResume', (id, replayedEvents) => {
         process.send!({
-          payload: 'DJSeed::Shard_Resume',
+          payload: 'Shard_Resume',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -176,7 +176,7 @@ export class ClusterPartial {
       })
       .on('shardReconnecting', (id) => {
         process.send!({
-          payload: 'DJSeed::Shard_Reconnecting',
+          payload: 'Shard_Reconnecting',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -187,7 +187,7 @@ export class ClusterPartial {
       })
       .on('shardDisconnect', (closeEvent, id) => {
         process.send!({
-          payload: 'DJSeed::Shard_Disconnect',
+          payload: 'Shard_Disconnect',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -203,7 +203,7 @@ export class ClusterPartial {
         const stack = String(err.stack)
 
         process.send!({
-          payload: 'DJSeed::Shard_Error',
+          payload: 'Shard_Error',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -219,7 +219,7 @@ export class ClusterPartial {
       })
       .on('ready', () => {
         process.send!({
-          payload: 'DJSeed::Cluster_Ready',
+          payload: 'Cluster_Ready',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -227,7 +227,7 @@ export class ClusterPartial {
           },
         })
 
-        process.send!({ payload: 'DJSeed::Cluster_Shards_Prepared' })
+        process.send!({ payload: 'Cluster_Shards_Prepared' })
       })
   }
 
@@ -256,7 +256,7 @@ export class ClusterPartial {
         data.message += String("\nThis has to do with your code, NOT DJSeed's!")
 
         process.send!({
-          payload: 'DJSeed::Cluster_Error',
+          payload: 'Cluster_Error',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -269,7 +269,7 @@ export class ClusterPartial {
   }
 
   protected payloads: Payloads = {
-    'DJSeed::Cluster_Stats_Request': (): void => {
+    Cluster_Stats_Request: (): void => {
       const shards = []
       for (const shard of this._client.ws.shards.values()) {
         shards.push({
@@ -279,7 +279,7 @@ export class ClusterPartial {
         })
       }
       process.send!({
-        payload: 'DJSeed::Cluster_Stats_Response',
+        payload: 'Cluster_Stats_Response',
         data: {
           id: this.id,
           guilds: this._client.guilds.cache.size,
@@ -299,7 +299,7 @@ export class ClusterPartial {
         },
       })
     },
-    'DJSeed::Broadcast_Eval_Request': async (msg: BroadcastEvalEvent): Promise<void> => {
+    Broadcast_Eval_Request: async (msg: BroadcastEvalEvent): Promise<void> => {
       try {
         const references = Object.entries(msg.data.references ?? {})
 
@@ -316,7 +316,7 @@ export class ClusterPartial {
         const result = await scoped()
 
         process.send!({
-          payload: 'DJSeed::Broadcast_Eval_Response',
+          payload: 'Broadcast_Eval_Response',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
@@ -338,7 +338,7 @@ export class ClusterPartial {
         }
 
         process.send!({
-          payload: 'DJSeed::Broadcast_Eval_Response',
+          payload: 'Broadcast_Eval_Response',
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),

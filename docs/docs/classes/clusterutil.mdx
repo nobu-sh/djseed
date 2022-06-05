@@ -172,7 +172,7 @@ ___
 
 ## Events
 
-### DJSeed::Cluster_Util_Info
+### Cluster_Util_Info
 Sends general debug info for telling when a cluster is ready or whatnot.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -180,7 +180,7 @@ Sends general debug info for telling when a cluster is ready or whatnot.
 | info | [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | - | - | Info Event. |
 ___
 
-### DJSeed::Cluster_Util_Error
+### Cluster_Util_Error
 Usually sent when you write bad code that throws an error.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -188,7 +188,7 @@ Usually sent when you write bad code that throws an error.
 | error | [ClusterUtilError](/docs/typedefs/clusterutilerror) | - | - | Error Info. |
 ___
 
-### DJSeed::Cluster_Death
+### Cluster_Death
 Sent when a cluster dies.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -196,7 +196,7 @@ Sent when a cluster dies.
 | death | [ClusterDeath](/docs/typedefs/clusterdeath) | - | - | Death Info. |
 ___
 
-### DJSeed::Cluster_Error
+### Cluster_Error
 Sent when a cluster errors out. Usually sent when you write bas code that throws an error.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -204,7 +204,7 @@ Sent when a cluster errors out. Usually sent when you write bas code that throws
 | error | [ClusterError](/docs/typedefs/clustererror) | - | - | Error Info. |
 ___
 
-### DJSeed::Cluster_Warn
+### Cluster_Warn
 Sent when a cluster encounters a warn usually somthing to do with DJS.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -212,7 +212,7 @@ Sent when a cluster encounters a warn usually somthing to do with DJS.
 | warn | [ClusterWarn](/docs/typedefs/clusterwarn) | - | - | Warn Info. |
 ___
 
-### DJSeed::Cluster_Ready
+### Cluster_Ready
 Sent when a cluster becomes ready.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -220,7 +220,7 @@ Sent when a cluster becomes ready.
 | ready | [ClusterReady](/docs/typedefs/clusterready) | - | - | Ready Info. |
 ___
 
-### DJSeed::Shard_Ready
+### Shard_Ready
 Sent when a shard on a cluster becomes ready.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -228,7 +228,7 @@ Sent when a shard on a cluster becomes ready.
 | ready | [ShardReady](/docs/typedefs/shardready) | - | - | Ready Info. |
 ___
 
-### DJSeed::Shard_Resume
+### Shard_Resume
 Sent when a shard on a cluster resumes.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -236,7 +236,7 @@ Sent when a shard on a cluster resumes.
 | resume | [ShardResume](/docs/typedefs/shardresume) | - | - | Resume Info. |
 ___
 
-### DJSeed::Shard_Reconnecting
+### Shard_Reconnecting
 Sent when a shard on a cluster is reconnecting.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -244,7 +244,7 @@ Sent when a shard on a cluster is reconnecting.
 | reconnecting | [ShardReconnecting](/docs/typedefs/shardreconnecting) | - | - | Reconnecting Info. |
 ___
 
-### DJSeed::Shard_Disconnect
+### Shard_Disconnect
 Sent when a shard on a cluster disconnects.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
@@ -252,7 +252,7 @@ Sent when a shard on a cluster disconnects.
 | disconnect | [ShardDisconnect](/docs/typedefs/sharddisconnect) | - | - | Disconnect Info. |
 ___
 
-### DJSeed::Shard_Error
+### Shard_Error
 Sent when a shard on a cluster encounters and error. Sent when your code sucks, you know the drill.
 
 | PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |

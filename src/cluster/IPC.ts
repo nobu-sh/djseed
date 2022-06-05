@@ -151,7 +151,7 @@ export class IPC {
    */
   public send(event: string, ...content: unknown[]): void {
     process.send!({
-      payload: 'DJSeed::IPC_Broadcast_Event',
+      payload: 'IPC_Broadcast_Event',
       data: {
         event,
         content: content,
@@ -171,7 +171,7 @@ export class IPC {
    */
   public sendTo(cluster: number, event: string, ...content: unknown[]): void {
     process.send!({
-      payload: 'DJSeed::IPC_Send_To_Event',
+      payload: 'IPC_Send_To_Event',
       cluster,
       data: {
         event,

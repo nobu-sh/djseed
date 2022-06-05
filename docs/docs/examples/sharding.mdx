@@ -54,17 +54,17 @@ const util = new ClusterUtil('replace-with-bot-token', './cluster.js');
 // NOTE: We are registering a listener to every event here.
 // You are not required to do this. We utilize events instead of 
 // Logging so you can handle telemetry however you like!
-util.on('DJSeed::Cluster_Util_Info', (i) => console.log('[DJSeed::Cluster_Util_Info]:', i));
-util.on('DJSeed::Cluster_Util_Error', (i) => console.log('[DJSeed::Cluster_Util_Error]:', i));
-util.on('DJSeed::Cluster_Ready', (i) => console.log('[DJSeed::Cluster_Ready]:', i));
-util.on('DJSeed::Cluster_Death', (i) => console.log('[DJSeed::Cluster_Death]:', i));
-util.on('DJSeed::Cluster_Error', (i) => console.log('[DJSeed::Cluster_Error]:', i));
-util.on('DJSeed::Cluster_Warn', (i) => console.log('[DJSeed::Cluster_Warn]:', i));
-util.on('DJSeed::Shard_Ready', (i) => console.log('[DJSeed::Shard_Ready]:', i));
-util.on('DJSeed::Shard_Resume', (i) => console.log('[DJSeed::Shard_Resume]:', i));
-util.on('DJSeed::Shard_Reconnecting', (i) => console.log('[DJSeed::Shard_Reconnecting]:', i));
-util.on('DJSeed::Shard_Disconnect', (i) => console.log('[DJSeed::Shard_Disconnect]:', i));
-util.on('DJSeed::Shard_Error', (i) => console.log('[DJSeed::Shard_Error]:', i));
+util.on('Cluster_Util_Info', (i) => console.log('[Cluster_Util_Info]:', i));
+util.on('Cluster_Util_Error', (i) => console.log('[Cluster_Util_Error]:', i));
+util.on('Cluster_Ready', (i) => console.log('[Cluster_Ready]:', i));
+util.on('Cluster_Death', (i) => console.log('[Cluster_Death]:', i));
+util.on('Cluster_Error', (i) => console.log('[Cluster_Error]:', i));
+util.on('Cluster_Warn', (i) => console.log('[Cluster_Warn]:', i));
+util.on('Shard_Ready', (i) => console.log('[Shard_Ready]:', i));
+util.on('Shard_Resume', (i) => console.log('[Shard_Resume]:', i));
+util.on('Shard_Reconnecting', (i) => console.log('[Shard_Reconnecting]:', i));
+util.on('Shard_Disconnect', (i) => console.log('[Shard_Disconnect]:', i));
+util.on('Shard_Error', (i) => console.log('[Shard_Error]:', i));
 
 
 // Start Util.

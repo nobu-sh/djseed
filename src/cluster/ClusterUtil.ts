@@ -75,7 +75,7 @@ export class ClusterUtil extends EventEmitter {
     process.setMaxListeners(Infinity)
     nodeCluster.setMaxListeners(Infinity)
 
-    this.on('DJSeed::Cluster_Death', (data) => this.sendEvent({ payload: 'DJSeed::Cluster_Death', data }))
+    this.on('Cluster_Death', (data) => this.sendEvent({ payload: 'Cluster_Death', data }))
   }
 
   /**
@@ -88,7 +88,7 @@ export class ClusterUtil extends EventEmitter {
 
   protected _preStart(): void {
     process.nextTick(async () => {
-      this.emit('DJSeed::Cluster_Util_Info', 'Started!')
+      this.emit('Cluster_Util_Info', 'Started!')
       if (!this._totalShards) {
         try {
           const gateway = await getGateway(this._token)
@@ -111,7 +111,7 @@ export class ClusterUtil extends EventEmitter {
       }
 
       this.emit(
-        'DJSeed::Cluster_Util_Info',
+        'Cluster_Util_Info',
         `Calculations Complete! Starting ${this._totalShards} shards across ${this._totalClusters} clusters!`,
       )
 
@@ -153,13 +153,13 @@ export class ClusterUtil extends EventEmitter {
       await this._awaitResponse()
     }
 
-    this.emit('DJSeed::Cluster_Util_Info', 'All clusters have launched!')
+    this.emit('Cluster_Util_Info', 'All clusters have launched!')
   }
 
   protected async _awaitResponse(): Promise<boolean> {
     return new Promise((res) => {
       const cb = (_: Worker, msg: ProcessEventPartials) => {
-        if (msg.payload && msg.payload === 'DJSeed::Cluster_Shards_Prepared') {
+        if (msg.payload && msg.payload === 'Cluster_Shards_Prepared') {
           nodeCluster.removeListener('message', cb)
           res(true)
         }
@@ -174,7 +174,7 @@ export class ClusterUtil extends EventEmitter {
       const message = String(err.message)
       const stack = String(err.stack)
 
-      this.emit('DJSeed::Cluster_Util_Error', {
+      this.emit('Cluster_Util_Error', {
         type: 'Uncaught Exception',
         error: {
           name,
@@ -196,7 +196,7 @@ export class ClusterUtil extends EventEmitter {
         data.stack = String(error.stack)
       }
 
-      this.emit('DJSeed::Cluster_Util_Error', {
+      this.emit('Cluster_Util_Error', {
         type: 'Unhandled Rejection',
         error: data as unknown as CommonError,
       })
@@ -207,7 +207,7 @@ export class ClusterUtil extends EventEmitter {
     nodeCluster.on('disconnect', (w) => {
       const clusterId = this._workers.get(w.id)!
       const cluster = this._clusters.get(clusterId)!
-      this.emit('DJSeed::Cluster_Warn', {
+      this.emit('Cluster_Warn', {
         id: clusterId,
         shards: createRange(cluster.firstShard, cluster.lastShard),
         type: 'Cluster Disconnected',
@@ -222,7 +222,7 @@ export class ClusterUtil extends EventEmitter {
   protected restartCluster(worker: Worker, code: number, signal: string): void {
     const clusterId = this._workers.get(worker.id)!
     const cluster = this._clusters.get(clusterId)!
-    this.emit('DJSeed::Cluster_Death', {
+    this.emit('Cluster_Death', {
       id: clusterId,
       shards: createRange(cluster.firstShard, cluster.lastShard),
       type: 'Cluster Died',
@@ -269,7 +269,7 @@ export class ClusterUtil extends EventEmitter {
 
         data.message += String("\nThis has to do with your code, NOT DJSeed's!")
 
-        this.emit('DJSeed::Cluster_Util_Error', {
+        this.emit('Cluster_Util_Error', {
           type: 'Payload Execution Failed.',
           error: data as unknown as CommonError,
         })
@@ -278,71 +278,71 @@ export class ClusterUtil extends EventEmitter {
   }
 
   protected payloads: Payloads = {
-    'DJSeed::Cluster_Error': (msg: ProcessEventPartials) => {
+    Cluster_Error: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Cluster_Warn': (msg: ProcessEventPartials) => {
+    Cluster_Warn: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Shard_Ready': (msg: ProcessEventPartials) => {
+    Shard_Ready: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Shard_Resume': (msg: ProcessEventPartials) => {
+    Shard_Resume: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Shard_Reconnecting': (msg: ProcessEventPartials) => {
+    Shard_Reconnecting: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Shard_Disconnect': (msg: ProcessEventPartials) => {
+    Shard_Disconnect: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Shard_Error': (msg: ProcessEventPartials) => {
+    Shard_Error: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Cluster_Ready': (msg: ProcessEventPartials) => {
+    Cluster_Ready: (msg: ProcessEventPartials) => {
       this.emit(msg.payload, msg.data)
       this.sendEvent(msg)
     },
-    'DJSeed::Dispose_Self_Request': (msg: ProcessEventPartials) => {
+    Dispose_Self_Request: (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN)) return
       // this.emit(msg.payload, msg.data)
-      this.sendEventTo(msg.cluster!, { payload: 'DJSeed::Dispose_Self' })
+      this.sendEventTo(msg.cluster!, { payload: 'Dispose_Self' })
     },
-    'DJSeed::IPC_Broadcast_Event': (msg: ProcessEventPartials) => {
+    IPC_Broadcast_Event: (msg: ProcessEventPartials) => {
       if (!('event' in (msg.data ?? {}))) return
       // this.emit(msg.payload, msg.data)
       this.broadcast(msg.data as IPCEvent)
     },
-    'DJSeed::IPC_Send_To_Event': (msg: ProcessEventPartials) => {
+    IPC_Send_To_Event: (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN) || !('event' in (msg.data ?? {}))) return
       // this.emit(msg.payload, msg.data)
       this.sendTo(msg.cluster!, msg.data as IPCEvent)
     },
-    'DJSeed::Util_All_Stats_Request': async (msg: ProcessEventPartials) => {
+    Util_All_Stats_Request: async (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN)) return
       this.sendEventTo(msg.cluster!, {
-        payload: 'DJSeed::Util_All_Stats_Response',
+        payload: 'Util_All_Stats_Response',
         data: await this.getStats(),
       })
     },
-    'DJSeed::Util_Stats_Request': async (msg: ProcessEventPartials) => {
+    Util_Stats_Request: async (msg: ProcessEventPartials) => {
       if (isNaN(msg.cluster ?? NaN) || !('clusterId' in (msg.data ?? {})) || isNaN(msg.data.clusterId as number)) return
       this.sendEventTo(msg.cluster!, {
-        payload: 'DJSeed::Util_Stats_Response',
+        payload: 'Util_Stats_Response',
         data: [await this.getStatsFrom(msg.data.clusterId as number)],
       })
     },
-    'DJSeed::Util_Broadcast_Eval_Request': async (msg: BroadcastEvalEvent) => {
+    Util_Broadcast_Eval_Request: async (msg: BroadcastEvalEvent) => {
       if (isNaN(msg.cluster ?? NaN) || !('callback' in msg.data)) return
       this.sendEventTo(msg.cluster!, {
-        payload: 'DJSeed::Util_Broadcast_Eval_Response',
+        payload: 'Util_Broadcast_Eval_Response',
         data: await this.broadcastEval(msg.data.callback as unknown as BroadcastEvalCallback, msg.data.references),
       })
     },
@@ -369,13 +369,13 @@ export class ClusterUtil extends EventEmitter {
     const response = async (): Promise<ClusterStats> => {
       return new Promise((r) => {
         const callback = (_: Worker, m: ProcessEventPartials) => {
-          if (m.payload === 'DJSeed::Cluster_Stats_Response') {
+          if (m.payload === 'Cluster_Stats_Response') {
             nodeCluster.removeListener('message', callback)
             r(m.data as ClusterStats)
           }
         }
         nodeCluster.on('message', callback)
-        this.sendEventTo(clusterId, { payload: 'DJSeed::Cluster_Stats_Request' })
+        this.sendEventTo(clusterId, { payload: 'Cluster_Stats_Request' })
       })
     }
     return response()
@@ -482,14 +482,14 @@ export class ClusterUtil extends EventEmitter {
       async function getEval(): Promise<BroadcastEvalResponse<T>> {
         return new Promise((r) => {
           const cb = (_: Worker, m: ProcessEventPartials) => {
-            if (m.payload === 'DJSeed::Broadcast_Eval_Response') {
+            if (m.payload === 'Broadcast_Eval_Response') {
               nodeCluster.removeListener('message', cb)
               r(m.data as BroadcastEvalResponse<T>)
             }
           }
           nodeCluster.on('message', cb)
           nodeCluster.workers![cluster.workerId]?.send({
-            payload: 'DJSeed::Broadcast_Eval_Request',
+            payload: 'Broadcast_Eval_Request',
             data: { callback: callback.toString(), references },
           })
         })
@@ -508,7 +508,7 @@ export class ClusterUtil extends EventEmitter {
    * @param clusterId Id of cluster.
    */
   public disposeOf(clusterId: number): void {
-    this.sendEventTo(clusterId, { payload: 'DJSeed::Dispose_Self' })
+    this.sendEventTo(clusterId, { payload: 'Dispose_Self' })
   }
 
   /**

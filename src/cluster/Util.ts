@@ -7,7 +7,7 @@ export class Util {
     this.id = id
     // Handle Dispose/Kill
     process.on('message', (msg: ProcessEventPartials) => {
-      if (msg.payload === 'DJSeed::Dispose_Self') {
+      if (msg.payload === 'Dispose_Self') {
         process.exit(0)
       }
     })
@@ -19,14 +19,14 @@ export class Util {
   public async getStats(): Promise<ClusterStats[]> {
     return new Promise((r) => {
       const callback = (msg: ProcessEventPartials) => {
-        if (msg.payload === 'DJSeed::Util_All_Stats_Response') {
+        if (msg.payload === 'Util_All_Stats_Response') {
           process.removeListener('message', callback)
           r(msg.data as ClusterStats[])
         }
       }
       process.on('message', callback)
       process.send!({
-        payload: 'DJSeed::Util_All_Stats_Request',
+        payload: 'Util_All_Stats_Request',
         cluster: this.id,
       })
     })
@@ -39,14 +39,14 @@ export class Util {
     if (isNaN(clusterId)) return undefined
     return new Promise((r) => {
       const callback = (msg: ProcessEventPartials) => {
-        if (msg.payload === 'DJSeed::Util_Stats_Response') {
+        if (msg.payload === 'Util_Stats_Response') {
           process.removeListener('message', callback)
           r((msg.data as ClusterStats[])[0] ?? undefined)
         }
       }
       process.on('message', callback)
       process.send!({
-        payload: 'DJSeed::Util_Stats_Request',
+        payload: 'Util_Stats_Request',
         cluster: this.id,
         data: {
           clusterId,
@@ -69,14 +69,14 @@ export class Util {
   ): Promise<BroadcastEvalResponse<T>[]> {
     return new Promise((r) => {
       const cb = (msg: ProcessEventPartials) => {
-        if (msg.payload === 'DJSeed::Util_Broadcast_Eval_Response') {
+        if (msg.payload === 'Util_Broadcast_Eval_Response') {
           process.removeListener('message', cb)
           r(msg.data as BroadcastEvalResponse<T>[])
         }
       }
       process.on('message', cb)
       process.send!({
-        payload: 'DJSeed::Util_Broadcast_Eval_Request',
+        payload: 'Util_Broadcast_Eval_Request',
         cluster: this.id,
         data: { callback: callback.toString(), references },
       })
@@ -91,7 +91,7 @@ export class Util {
    */
   public disposeOf(clusterId: number): void {
     process.send!({
-      payload: 'DJSeed::Dispose_Self_Request',
+      payload: 'Dispose_Self_Request',
       cluster: clusterId,
     })
   }

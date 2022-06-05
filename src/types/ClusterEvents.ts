@@ -5,39 +5,39 @@ export interface ClusterEvents {
   /**
    * Sent when a cluster encounters an error.
    */
-  'DJSeed::Cluster_Error': [Cluster_Error]
+  Cluster_Error: [Cluster_Error]
   /**
    * Sent when a cluster came close to having an error.
    */
-  'DJSeed::Cluster_Warn': [Cluster_Warn]
+  Cluster_Warn: [Cluster_Warn]
   /**
    * Sent when a shard becomes ready.
    */
-  'DJSeed::Shard_Ready': [Shard_Ready]
+  Shard_Ready: [Shard_Ready]
   /**
    * Sent when a shard has resumed successfully.
    */
-  'DJSeed::Shard_Resume': [Shard_Resume]
+  Shard_Resume: [Shard_Resume]
   /**
    * Sent when a shard it attempting to reconnect to Discord gateway.
    */
-  'DJSeed::Shard_Reconnecting': [Shard_Reconnecting]
+  Shard_Reconnecting: [Shard_Reconnecting]
   /**
    * Send when a shard has disconnected for Discord gateway.
    */
-  'DJSeed::Shard_Disconnect': [Shard_Disconnect]
+  Shard_Disconnect: [Shard_Disconnect]
   /**
    * Sent when a shard encounters an error.
    */
-  'DJSeed::Shard_Error': [Shard_Error]
+  Shard_Error: [Shard_Error]
   /**
    * Sent when a cluster has become ready.
    */
-  'DJSeed::Cluster_Ready': [Cluster_Ready]
+  Cluster_Ready: [Cluster_Ready]
   /**
    * Sent when a cluster dies.
    */
-  'DJSeed::Cluster_Death': [Cluster_Death]
+  Cluster_Death: [Cluster_Death]
 }
 
 export interface Cluster_Error {
