@@ -1,6 +1,6 @@
 {
   "name": "djseed",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "💫 Discord.JS multiutil.",
   "license": "MIT",
   "author": "nobu-sh",
@@ -14,7 +14,8 @@
     "prepare": "husky install",
     "test": "ts-node ./__tests__/index.ts",
     "jest:test": "jest --pass-with-no-tests",
-    "jest:test:ci": "jest --no-stack-trace --verbose --pass-with-no-tests"
+    "jest:test:ci": "jest --no-stack-trace --verbose --pass-with-no-tests",
+    "deploy:docs": "cd ./docs & cmd /C \"set \"GIT_USER=nobu_sh\" && npm run deploy\""
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -49,6 +50,7 @@
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-angular": "^16.0.0",
     "@commitlint/prompt-cli": "^16.0.0",
+    "@swc/core": "^1.2.196",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.39",
     "@typescript-eslint/eslint-plugin": "^5.9.0",

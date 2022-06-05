@@ -156,7 +156,7 @@ export class ClusterPartial {
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
-            type: 'Shard Is Ready',
+            type: 'Shard is Ready',
             shard: id,
             unavailabledGuilds,
           },
@@ -180,7 +180,7 @@ export class ClusterPartial {
           data: {
             id: this.id,
             shards: createRange(this.firstShard, this.lastShard),
-            type: 'Shard Is Reconnecting',
+            type: 'Shard is Reconnecting',
             shard: id,
           },
         })
