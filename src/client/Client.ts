@@ -1,33 +1,28 @@
 import { Client as DJSClient } from 'discord.js'
 import { ClusterPartial } from '../cluster/ClusterPartial'
-import { createRange } from '../utils/createRange'
 import type { ClientOptions, ClientEvents, Awaitable } from '../types'
+import { createRange } from '../utils/createRange'
 
 // Interface to override events interface
 export interface Client {
-  on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>): this
-  on<S extends string | symbol>(
+  on: (<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClientEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>): this
-  once<S extends string | symbol>(
+  once: (<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClientEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean
-  emit<S extends string | symbol>(event: Exclude<S, keyof ClientEvents>, ...args: unknown[]): boolean
+  emit: (<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]) => boolean) & (<S extends string | symbol>(event: Exclude<S, keyof ClientEvents>, ...args: unknown[]) => boolean)
 
-  off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>): this
-  off<S extends string | symbol>(
+  off: (<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClientEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  removeAllListeners<K extends keyof ClientEvents>(event?: K): this
-  removeAllListeners<S extends string | symbol>(event?: Exclude<S, keyof ClientEvents>): this
+  removeAllListeners: (<K extends keyof ClientEvents>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof ClientEvents>) => this)
 }
 
 // We need to override Client to add new
@@ -58,9 +53,9 @@ export class Client extends DJSClient {
 
       // If current proc is not a child, define process.send as an emit instead
       const noop = (..._: any[]): boolean => {
-        const item = _[0]
+        const item = _[0] as { payload?: string, data?: object } | undefined
         if (!item || !item.payload) return false
-        return this.cluster!.events.emit(item.payload as string, item.data ?? {})
+        return this.cluster!.events.emit(item.payload, item.data ?? {})
       }
       process.send = process.send ?? noop
 

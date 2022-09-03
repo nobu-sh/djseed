@@ -1,0 +1,86 @@
+---
+title: ClusterEventEmitter
+---
+
+#### Extends [EventEmitter](https://nodejs.org/api/events.html)
+
+Recieves events from primary node about other clusters.
+
+## Constructor
+
+```js
+new ClusterEventEmitter();
+```
+## Events
+
+### Cluster_Death
+Sent when a cluster dies.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| death | [ClusterDeath](/docs/typedefs/clusterdeath) | - | - | Death Info. |
+___
+
+### Cluster_Error
+Sent when a cluster errors out. Usually sent when you write bas code that throws an error.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| error | [ClusterError](/docs/typedefs/clustererror) | - | - | Error Info. |
+___
+
+### Cluster_Warn
+Sent when a cluster encounters a warn usually somthing to do with DJS.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| warn | [ClusterWarn](/docs/typedefs/clusterwarn) | - | - | Warn Info. |
+___
+
+### Cluster_Ready
+Sent when a cluster becomes ready.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| ready | [ClusterReady](/docs/typedefs/clusterready) | - | - | Ready Info. |
+___
+
+### Shard_Ready
+Sent when a shard on a cluster becomes ready.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| ready | [ShardReady](/docs/typedefs/shardready) | - | - | Ready Info. |
+___
+
+### Shard_Resume
+Sent when a shard on a cluster resumes.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| resume | [ShardResume](/docs/typedefs/shardresume) | - | - | Resume Info. |
+___
+
+### Shard_Reconnecting
+Sent when a shard on a cluster is reconnecting.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| reconnecting | [ShardReconnecting](/docs/typedefs/shardreconnecting) | - | - | Reconnecting Info. |
+___
+
+### Shard_Disconnect
+Sent when a shard on a cluster disconnects.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| disconnect | [ShardDisconnect](/docs/typedefs/sharddisconnect) | - | - | Disconnect Info. |
+___
+
+### Shard_Error
+Sent when a shard on a cluster encounters and error. Sent when your code sucks, you know the drill.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| error | [ShardError](/docs/typedefs/sharderror) | - | - | Error Info. |
+___

@@ -1,7 +1,7 @@
 {
   "name": "djseed",
-  "version": "13.0.0",
-  "description": "💫 Discord.JS multiutil.",
+  "version": "14.0.0",
+  "description": "💫 Discord.JS multiutil",
   "license": "MIT",
   "author": "nobu-sh",
   "scripts": {
@@ -40,7 +40,7 @@
     "axios": "^0.24.0"
   },
   "peerDependencies": {
-    "discord.js": ">= 13.5.0"
+    "discord.js": ">= 14.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",

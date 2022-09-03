@@ -1,6 +1,6 @@
-import { Constants, Options } from 'discord.js'
-import { HTTP } from '../Constants'
 import Axios from 'axios'
+import { Options } from 'discord.js'
+import { HTTP } from '../Constants'
 
 export interface BotGateway {
   url: string
@@ -15,9 +15,9 @@ export interface BotGateway {
 
 export async function getGateway(token: string): Promise<BotGateway> {
   const defaultOptions = Options.createDefault()
-  const url = defaultOptions.http?.api ?? HTTP.url
-  const version = defaultOptions.http?.version ?? HTTP.v
-  const gateway = `${url}/v${version}${Constants.Endpoints.botGateway}`
+  const url = defaultOptions.rest?.api ?? HTTP.url
+  const version = defaultOptions.rest?.version ?? HTTP.v
+  const gateway = `${url}/v${version}/gateway/bot`
 
   return new Promise((res, rej) => {
     Axios({

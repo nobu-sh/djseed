@@ -1,0 +1,77 @@
+---
+sidebar_position: 2
+title: Reserved Names
+---
+
+DJSeed has a handful of reserved event names and environment variables names that
+cannot be overridden or reused without potentially breaking functionality.
+
+## Environment Variables
+These variables are utilized in the parent and worker threads to help communicate
+primitive information. Assigning or overriding these variables will most likely cause breakage
+if you don't know what you are doing.
+
+- `DJSeed::Cluster_Util_Enabled`
+- `DJSeed::Total_Shard_Amount`
+- `DJSeed::First_Shard_Identifier`
+- `DJSeed::Last_Shard_Identifier`
+- `DJSeed::Child_Cluster_Identifier`
+- `DJSeed::Total_Child_Cluster_Amount`
+
+## Cluster Util Events
+These are events emitted on [ClusterUtil](/docs/classes/clusterutil#events) and [ClusterEventEmitter](/docs/classes/clustereventemitter)
+emitting these events manually with incorrect data may cause breakage.
+
+- `Cluster_Util_Info` **[ClusterUtil](/docs/classes/clusterutil)**
+- `Cluster_Util_Error` **[ClusterUtil](/docs/classes/clusterutil)**
+- `Cluster_Ready` **Both**
+- `Cluster_Death` **Both**
+- `Cluster_Error` **Both**
+- `Cluster_Warn` **Both**
+- `Shard_Ready` **Both**
+- `Shard_Resume` **Both**
+- `Shard_Reconnecting` **Both**
+- `Shard_Disconnect` **Both**
+- `Shard_Error` **Both**
+
+## Process IPC Payloads
+Not to be confused with [IPC](/docs/classes/ipc)... [Process IPC](https://nodejs.org/api/process.html#processsendmessage-sendhandle-options-callback) is utilized to
+communicate primitave messages to the worker threads as it is the easiest way to communicate between
+processes. These are the most detrimental to the entire package so it is advised to stay away from using these names!
+
+
+```js title="Example Process IPC Payload"
+{
+  payload: 'event_name',
+  data: {
+    ...
+  }
+}
+```
+> You can still use process IPC but it is suggested to structure your messages
+differently so you don't need to worry about conflicting payloads.
+
+### Reserved Payloads
+- `Cluster_Shards_Prepared`
+- `Cluster_Stats_Response`
+- `Cluster_Stats_Request`
+- `Broadcast_Eval_Response`
+- `Broadcast_Eval_Request`
+- `Cluster_Error`
+- `Cluster_Warn`
+- `Shard_Ready`
+- `Shard_Resume`
+- `Shard_Reconnecting`
+- `Shard_Disconnect`
+- `Shard_Error`
+- `Cluster_Ready`
+- `Dispose_Self_Request`
+- `Dispose_Self`
+- `IPC_Broadcast_Event`
+- `IPC_Send_To_Event`
+- `Util_All_Stats_Request`
+- `Util_All_Stats_Response`
+- `Util_Stats_Request`
+- `Util_Stats_Response`
+- `Util_Broadcast_Eval_Request`
+- `Util_Broadcast_Eval_Response`

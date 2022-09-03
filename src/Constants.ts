@@ -1,4 +1,4 @@
 export const HTTP = {
   url: 'https://discord.com/api',
-  v: 9,
+  v: 10,
 }

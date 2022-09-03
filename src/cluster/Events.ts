@@ -1,30 +1,25 @@
-import type { ClusterEvents, Awaitable, ProcessEventPartials } from '../types'
 import { EventEmitter } from 'events'
+import type { ClusterEvents, Awaitable, ProcessEventPartials } from '../types'
 
 export interface ClusterEventEmitter {
-  on<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>): this
-  on<S extends string | symbol>(
+  on: (<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  once<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>): this
-  once<S extends string | symbol>(
+  once: (<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  emit<K extends keyof ClusterEvents>(event: K, ...args: ClusterEvents[K]): boolean
-  emit<S extends string | symbol>(event: Exclude<S, keyof ClusterEvents>, ...args: unknown[]): boolean
+  emit: (<K extends keyof ClusterEvents>(event: K, ...args: ClusterEvents[K]) => boolean) & (<S extends string | symbol>(event: Exclude<S, keyof ClusterEvents>, ...args: unknown[]) => boolean)
 
-  off<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>): this
-  off<S extends string | symbol>(
+  off: (<K extends keyof ClusterEvents>(event: K, listener: (...args: ClusterEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  removeAllListeners<K extends keyof ClusterEvents>(event?: K): this
-  removeAllListeners<S extends string | symbol>(event?: Exclude<S, keyof ClusterEvents>): this
+  removeAllListeners: (<K extends keyof ClusterEvents>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof ClusterEvents>) => this)
 }
 
 // We need to override ClusterEvents to add

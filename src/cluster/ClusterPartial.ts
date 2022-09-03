@@ -1,9 +1,10 @@
-import type { ProcessEventPartials, BroadcastEvalEvent, BroadcastEvalCallback, Payloads } from '../types'
-import { createRange } from '../utils/createRange'
-import type { Client } from '../client/Client'
+import type { Awaitable } from 'discord.js'
 import { ClusterEventEmitter } from './Events'
 import { IPC } from './IPC'
 import { Util } from './Util'
+import type { Client } from '../client/Client'
+import type { ProcessEventPartials, BroadcastEvalEvent, BroadcastEvalCallback, Payloads } from '../types'
+import { createRange } from '../utils/createRange'
 
 export class ClusterPartial {
   protected started = false
@@ -303,12 +304,12 @@ export class ClusterPartial {
       try {
         const references = Object.entries(msg.data.references ?? {})
 
-        const scoped = (): Promise<any> => {
+        const scoped = (): Awaitable<unknown> => {
           // This concern is voiced in documentation
           // eslint-disable-next-line no-eval
           const callback: BroadcastEvalCallback = (0, eval)(
             `${references.map(([key, value]) => `const ${key} = ${value as string};`).join('')}\n${msg.data.callback}`,
-          )
+          ) as BroadcastEvalCallback
 
           return callback(this._client)
         }

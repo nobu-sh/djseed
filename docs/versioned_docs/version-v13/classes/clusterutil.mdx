@@ -1,0 +1,261 @@
+---
+title: ClusterUtil
+---
+
+#### Extends [EventEmitter](https://nodejs.org/api/events.html)
+
+The main hub for creating clusters.
+
+## Constructor
+
+```js
+new ClusterUtil(token, file, options);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| token | [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) |  ❌   | `undefined`  | Discord API Token. |
+| file | [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) |  ❌   | `undefined`  | Path to file containing [Client](/docs/classes/client) code. |
+| options | [ClusterUtilOptions?](/docs/typedefs/clusterutiloptions) |  ✔️   | `undefined`  | Options for cluster util. |
+
+## Methods
+
+### isPrimary
+Checks if the current process is the primary process.
+
+```js
+isPrimary();
+```
+
+#### Returns
+[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+___
+
+### getStats
+Returns stats on every cluster and the shards it contains etc.
+
+```js
+getStats();
+```
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [ClusterStats](/docs/typedefs/clusterstats)[] >
+___
+
+### getStatsFrom
+Returns stats on a specfic cluster and the shards it contains etc.
+
+```js
+getStatsFrom(clusterId);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Cluster identifier. |
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [ClusterStats](/docs/typedefs/clusterstats) | undefined >
+___
+
+### sendEvent
+Sends an event to every cluster through [events](/docs/Classes/clusterpartial#events-readonly).
+
+```js
+sendEvent(message);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| message | [ProcessEventPartials](/docs/typedefs/processeventpartials) |  ❌   | `undefined`  | Event Partials. |
+
+#### Returns
+void
+___
+
+### sendEventTo
+Sends an event to a certain cluster through [events](/docs/Classes/clusterpartial#events-readonly).
+
+```js
+sendEventTo(clusterId, message);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Clusters ID. |
+| message | [ProcessEventPartials](/docs/typedefs/processeventpartials) |  ❌   | `undefined`  | Event Partials. |
+
+#### Returns
+void
+___
+
+### broadcast
+Sends an IPC event to every cluster through [ipc](/docs/Classes/clusterpartial#ipc-readonly).
+
+```js
+broadcast(message);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| message | [IPCEvent](/docs/typedefs/ipcevent) |  ❌   | `undefined`  | IPC Event. |
+
+#### Returns
+void
+___
+
+### sendTo
+Sends an IPC event to a certain cluster through [ipc](/docs/Classes/clusterpartial#ipc-readonly).
+
+```js
+sendTo(clusterId, message);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Clusters ID. |
+| message | [IPCEvent](/docs/typedefs/ipcevent) |  ❌   | `undefined`  | IPC Event. |
+
+#### Returns
+void
+___
+
+### broadcastEval
+Sends some code to every cluter to be evaulated then returns the results or errors.
+
+:::note
+
+The callback may only contain references outside of the callback if you pass them as
+"references" where they will be scoped into context.
+
+:::
+
+```js
+broadcastEval(callback, references);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| callback | [BroadcastEvalCallback](/docs/typedefs/broadcastevalcallback) | ❌ | `undefined`  | Callback. |
+| references | [object?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) | ✔️ | `undefined` | Variables to reference in context. |
+
+#### Returns
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)< [BroadcastEvalResponse](/docs/typedefs/broadcastevalresponse)[] >
+___
+
+### disposeOf
+Sends a request to specified cluster to dispose itself.
+Will result in the cluster exiting with code 0 and being automatically
+restarted by `ClusterUtil`.
+
+```js
+disposeOf(clusterId);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| clusterId | [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) |  ❌   | `null`  | Cluster identifier. |
+
+#### Returns
+void
+___
+
+### launch
+Starts the util.
+
+```js
+launch();
+```
+
+#### Returns
+void
+___
+
+## Events
+
+### Cluster_Util_Info
+Sends general debug info for telling when a cluster is ready or whatnot.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| info | [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | - | - | Info Event. |
+___
+
+### Cluster_Util_Error
+Usually sent when you write bad code that throws an error.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| error | [ClusterUtilError](/docs/typedefs/clusterutilerror) | - | - | Error Info. |
+___
+
+### Cluster_Death
+Sent when a cluster dies.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| death | [ClusterDeath](/docs/typedefs/clusterdeath) | - | - | Death Info. |
+___
+
+### Cluster_Error
+Sent when a cluster errors out. Usually sent when you write bas code that throws an error.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| error | [ClusterError](/docs/typedefs/clustererror) | - | - | Error Info. |
+___
+
+### Cluster_Warn
+Sent when a cluster encounters a warn usually somthing to do with DJS.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| warn | [ClusterWarn](/docs/typedefs/clusterwarn) | - | - | Warn Info. |
+___
+
+### Cluster_Ready
+Sent when a cluster becomes ready.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| ready | [ClusterReady](/docs/typedefs/clusterready) | - | - | Ready Info. |
+___
+
+### Shard_Ready
+Sent when a shard on a cluster becomes ready.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| ready | [ShardReady](/docs/typedefs/shardready) | - | - | Ready Info. |
+___
+
+### Shard_Resume
+Sent when a shard on a cluster resumes.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| resume | [ShardResume](/docs/typedefs/shardresume) | - | - | Resume Info. |
+___
+
+### Shard_Reconnecting
+Sent when a shard on a cluster is reconnecting.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| reconnecting | [ShardReconnecting](/docs/typedefs/shardreconnecting) | - | - | Reconnecting Info. |
+___
+
+### Shard_Disconnect
+Sent when a shard on a cluster disconnects.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| disconnect | [ShardDisconnect](/docs/typedefs/sharddisconnect) | - | - | Disconnect Info. |
+___
+
+### Shard_Error
+Sent when a shard on a cluster encounters and error. Sent when your code sucks, you know the drill.
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| error | [ShardError](/docs/typedefs/sharderror) | - | - | Error Info. |
+___

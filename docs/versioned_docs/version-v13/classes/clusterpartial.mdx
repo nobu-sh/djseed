@@ -1,0 +1,78 @@
+---
+title: ClusterPartial
+---
+
+The main hub for interacting with different clusters.
+
+## Constructor
+
+```js
+new ClusterPartial(client);
+```
+
+| PARAMETER | TYPE | OPTIONAL | DEFAULT | DESCRIPTION |
+| :-------: | :--: | :------: | :-----: | :---------: |
+| client | [Client](/docs/Classes/client) |  ❌   | `undefined`  | DJSeed Client Instance. |
+
+## Methods
+
+### id `READONLY`
+Current cluster id.
+
+**Type:** [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
+___
+
+### totalShards `READONLY`
+Total shards across all clusters.
+
+**Type:** [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
+___
+
+### firstShard `READONLY`
+ID of first shard on current cluster.
+
+**Type:** [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
+___
+
+### lastShard `READONLY`
+ID of last shard on current cluster.
+
+**Type:** [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
+___
+
+### totalClusters `READONLY`
+Total amount of cluster currently open.
+
+**Type:** [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)
+___
+
+### ipc `READONLY`
+Class containing methods to easily interact with other clusters.
+
+**Type:** [IPC](/docs/classes/ipc)
+___
+
+### events `READONLY`
+One way events from other clusters.
+
+**Type:** [Events](/docs/classes/clustereventemitter)
+___
+
+### util `READONLY`
+Class containing helpful utility methods.
+
+**Type:** [Util](/docs/classes/Util)
+___
+
+## Methods
+
+### start
+Used to start cluster.
+
+:::warning
+You do not need to call this! This method is for [ClusterUtil](/docs/classes/clusterutil)
+:::
+
+#### Returns
+void
+___

@@ -78,10 +78,10 @@ This part is very similar to making a client in Discord.JS.
 
 ```js title="src/cluster.js"
 // Import Client And Intents.
-const { Client, GatewayIntentBits } = require('djseed');
+const { Client, Intents } = require('djseed');
 
 // Construct New Bot.
-const bot = new Client('replace-with-bot-token', { intents: [GatewayIntentBits.Guilds] });
+const bot = new Client('replace-with-bot-token', { intents: [Intents.FLAGS.GUILDS] });
 
 // Create Ready Listener.
 bot.once('ready', () => {

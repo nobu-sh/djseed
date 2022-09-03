@@ -1,3 +1,4 @@
+import type { Awaitable } from 'discord.js'
 import type { Client } from '../client/Client'
 
 export interface UncaughtProcError {
@@ -6,9 +7,9 @@ export interface UncaughtProcError {
   stack: string
 }
 
-export interface ProcessEventPartials {
+export interface ProcessEventPartials<D = any> {
   payload: string
-  data?: any
+  data?: D
   cluster?: number
 }
 
@@ -26,7 +27,7 @@ export interface BroadcastEvalEvent extends ProcessEventPartials {
   }
 }
 
-export type BroadcastEvalCallback = (client: Client) => any
+export type BroadcastEvalCallback = (client: Client) => Awaitable<unknown>
 
 export interface Payloads {
   [key: string]: (...args: any[]) => void | Promise<void>

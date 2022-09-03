@@ -1,4 +1,4 @@
-import { Client, Intents } from '../src'
+import { Client, GatewayIntentBits } from '../src'
 
 export async function run(): Promise<string> {
   console.log('Running Mock Cluster Client Test')
@@ -12,7 +12,7 @@ export async function run(): Promise<string> {
   process.env['DJSeed::Total_Child_Cluster_Amount'] = String(1)
 
   return new Promise((r, j) => {
-    const bot = new Client(process.env.TOKEN ?? '', { intents: [Intents.FLAGS.GUILDS] })
+    const bot = new Client(process.env.TOKEN ?? '', { intents: [GatewayIntentBits.Guilds] })
 
     bot.once('ready', () => {
       if (!bot.isReady()) {

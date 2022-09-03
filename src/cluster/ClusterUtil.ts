@@ -1,3 +1,7 @@
+import nodeCluster, { Worker } from 'cluster'
+import { EventEmitter } from 'events'
+import os from 'os'
+import path from 'path'
 import type {
   IPCEvent,
   ClusterUtilOptions,
@@ -12,40 +16,31 @@ import type {
   ClusterStats,
   BroadcastEvalEvent,
 } from '../types'
+import { chunk } from '../utils/chunk'
 import { createRange } from '../utils/createRange'
 import { getGateway } from '../utils/getGateway'
-import { chunk } from '../utils/chunk'
-import { EventEmitter } from 'events'
-import nodeCluster, { Worker } from 'cluster'
-import path from 'path'
-import os from 'os'
 
 const coreCount = os.cpus().length
 
 export interface ClusterUtil {
-  on<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
-  on<S extends string | symbol>(
+  on: (<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterUtilEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  once<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
-  once<S extends string | symbol>(
+  once: (<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterUtilEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  emit<K extends keyof ClusterUtilEvents>(event: K, ...args: ClusterUtilEvents[K]): boolean
-  emit<S extends string | symbol>(event: Exclude<S, keyof ClusterUtilEvents>, ...args: unknown[]): boolean
+  emit: (<K extends keyof ClusterUtilEvents>(event: K, ...args: ClusterUtilEvents[K]) => boolean) & (<S extends string | symbol>(event: Exclude<S, keyof ClusterUtilEvents>, ...args: unknown[]) => boolean)
 
-  off<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>): this
-  off<S extends string | symbol>(
+  off: (<K extends keyof ClusterUtilEvents>(event: K, listener: (...args: ClusterUtilEvents[K]) => Awaitable<void>) => this) & (<S extends string | symbol>(
     event: Exclude<S, keyof ClusterUtilEvents>,
     listener: (...args: any[]) => Awaitable<void>,
-  ): this
+  ) => this)
 
-  removeAllListeners<K extends keyof ClusterUtilEvents>(event?: K): this
-  removeAllListeners<S extends string | symbol>(event?: Exclude<S, keyof ClusterUtilEvents>): this
+  removeAllListeners: (<K extends keyof ClusterUtilEvents>(event?: K) => this) & (<S extends string | symbol>(event?: Exclude<S, keyof ClusterUtilEvents>) => this)
 }
 
 // We need to override ClusterUtil to add
@@ -332,11 +327,11 @@ export class ClusterUtil extends EventEmitter {
         data: await this.getStats(),
       })
     },
-    Util_Stats_Request: async (msg: ProcessEventPartials) => {
-      if (isNaN(msg.cluster ?? NaN) || !('clusterId' in (msg.data ?? {})) || isNaN(msg.data.clusterId as number)) return
+    Util_Stats_Request: async (msg: ProcessEventPartials<{ clusterId?: number }>) => {
+      if (isNaN(msg.cluster ?? NaN) || isNaN(msg.data?.clusterId ?? NaN)) return
       this.sendEventTo(msg.cluster!, {
         payload: 'Util_Stats_Response',
-        data: [await this.getStatsFrom(msg.data.clusterId as number)],
+        data: [await this.getStatsFrom(msg.data!.clusterId!)],
       })
     },
     Util_Broadcast_Eval_Request: async (msg: BroadcastEvalEvent) => {
@@ -366,18 +361,16 @@ export class ClusterUtil extends EventEmitter {
    */
   public async getStatsFrom(clusterId: number): Promise<ClusterStats | undefined> {
     if (!this._clusters.has(clusterId)) return undefined
-    const response = async (): Promise<ClusterStats> => {
-      return new Promise((r) => {
-        const callback = (_: Worker, m: ProcessEventPartials) => {
-          if (m.payload === 'Cluster_Stats_Response') {
-            nodeCluster.removeListener('message', callback)
-            r(m.data as ClusterStats)
-          }
+    const response = async (): Promise<ClusterStats> => new Promise((r) => {
+      const callback = (_: Worker, m: ProcessEventPartials) => {
+        if (m.payload === 'Cluster_Stats_Response') {
+          nodeCluster.removeListener('message', callback)
+          r(m.data as ClusterStats)
         }
-        nodeCluster.on('message', callback)
-        this.sendEventTo(clusterId, { payload: 'Cluster_Stats_Request' })
-      })
-    }
+      }
+      nodeCluster.on('message', callback)
+      this.sendEventTo(clusterId, { payload: 'Cluster_Stats_Request' })
+    })
     return response()
   }
 

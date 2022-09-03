@@ -17,7 +17,7 @@ So win, win... *right?*
 
 :::info
 
-DJSeed as of (9/02/2022) depends on on [Discord.js](https://discord.js.org/#/) version `>= 14.3.0`
+DJSeed as of (1/13/2022) depends on on [Discord.js](https://discord.js.org/#/) version `>= 13.5.0`
 
 :::
 
@@ -46,10 +46,10 @@ than prepare you for multithreading.
 
 ### Client
 ```js
-const { Client, GatewayIntentBits } = require('djseed')
+const { Client, Intents } = require('djseed')
 
 const bot = new Client('MY_COOL_TOKEN', {
-  intents: [GatewayIntentBits.Guilds],
+  intents: [Intents.FLAGS.GUILDS],
 })
 
 bot.on('ready', () => {
@@ -62,6 +62,6 @@ bot.login()
 
 ### Extra Notes
 
-DJSeed only exports `GatewayIntentBits` from [Discord.js](https://discord.js.org/#/)!
+DJSeed only exports `Intents` from [Discord.js](https://discord.js.org/#/)!
 If you wish to use other provided classes/methods/typedefs from [Discord.js](https://discord.js.org/#/)
 you must import them from it directly!

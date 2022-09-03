@@ -9,13 +9,13 @@ To keep it simple we are going to make a *chat* command that responds with the b
 
 ```js title="src/cluster.js"
 // Import Client And Intents.
-const { Client, GatewayIntentBits } = require('djseed');
+const { Client, Intents } = require('djseed');
 
 // Construct New Bot.
 const bot = new Client('replace-with-bot-token', {
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES
   ]
 });
 

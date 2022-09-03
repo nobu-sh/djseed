@@ -24,6 +24,20 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          versions: {
+            current: {
+              label: "v14 ᴺᴱᵂ",
+              path: "/",
+              banner: 'none',
+              badge: false
+            },
+            'v13': {
+              label: "v13 ⌛",
+              path: "v13",
+              banner: 'none',
+              badge: false
+            }
+          }
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -52,6 +66,17 @@ const config = {
             docId: 'starting',
             position: 'left',
             label: 'Guide'
+          },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right',
+            // dropdownItemsAfter: [
+            //   {
+            //     to: '/versions',
+            //     label: 'All versions'
+            //   }
+            // ],
+            dropdownActiveClassDisabled: true,
           },
           {
             href: 'https://github.com/nobu-sh/djseed',
