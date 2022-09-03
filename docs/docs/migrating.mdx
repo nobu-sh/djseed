@@ -1,0 +1,30 @@
+---
+sidebar_position: 6
+title: Migrating From v13
+---
+
+The only change from `v13` to `v14` was `Intents` changed to `GatewayIntentBits`.
+
+`Before`
+```js
+const { Client, Intents } = require('djseed')
+
+const bot = new Client('MY_COOL_TOKEN', {
+  intents: [Intents.FLAGS.GUILDS],
+})
+
+...
+```
+
+`Now`
+```js
+const { Client, GatewayIntentBits } = require('djseed')
+
+const bot = new Client('MY_COOL_TOKEN', {
+  intents: [GatewayIntentBits.Guilds],
+})
+
+...
+```
+
+There will be a major overhaul for this package in the near future. It will go under beta v15 and stay beta until DJS makes makes a v15.
