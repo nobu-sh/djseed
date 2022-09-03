@@ -24,16 +24,17 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          lastVersion: 'current',
           versions: {
             current: {
               label: "v14 ᴺᴱᵂ",
-              path: "/",
+              // path: "/",
               banner: 'none',
               badge: false
             },
             'v13': {
               label: "v13 ⌛",
-              path: "v13",
+              // path: "/v13",
               banner: 'none',
               badge: false
             }
