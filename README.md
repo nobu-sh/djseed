@@ -2,6 +2,8 @@
   <img src="./docs/static/img/logo.png" width=200>
 </p>
 
+EOL. Please source alternatives <3
+
 <h1 align="center">DJSeed</h1>
 
 DJSeed *(Dee-Jey-Es, See-Duh)* aims to be a quality of life addon for the popular
